@@ -50,6 +50,6 @@ describe('my-app', () => {
         // Get array of my-greeting custom elements
         const greetingEls = element.shadowRoot.querySelectorAll('my-greeting');
 
-        expect(greetingEls.length).toBe(1);
+        expect(greetingEls.length).toBe(2);
     });
 });
