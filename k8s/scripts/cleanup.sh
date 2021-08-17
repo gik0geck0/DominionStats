@@ -10,3 +10,5 @@ kubectl delete -f ../specs/foyer-config.yml
 
 kubectl delete -f ../specs/namespace.yml
 
+kubectl delete -f ../deployment.yaml
+
