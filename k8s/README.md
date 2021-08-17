@@ -7,10 +7,6 @@ Files in this folder can be used to deploy this LWC app to a k8s cluster.
 - Enable Kubernetes Cluster in Docker Desktop: https://docs.docker.com/desktop/kubernetes/
 - Verify that you can see the `docker-desktop` cluster: `kubectl config view`
 
-<!-- ## deploy foyer/postgres
-From: `cd uisf-foyer/k8s/scripts/`
-Run deploy script: `./start_app.sh` 
-(To cleanup the resources): `./cleanup.sh` -->
 ## Important Files
 The `Dockerfile` file that sits on the top level of this directory is used by docker to create the image of the
 container. This image will be used in the configuration of the k8s cluster via the `deployment.yaml` file. The
