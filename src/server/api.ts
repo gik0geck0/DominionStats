@@ -5,7 +5,14 @@ import express from 'express';
 import path from 'path';
 
 const app = express();
-app.use(helmet());
+app.use(helmet({
+    contentSecurityPolicy: {
+        useDefaults: true,
+        directives: {
+            "upgrade-insecure-requests": true
+        }
+    }
+}));
 app.use(compression());
 
 const HOST = process.env.HOST || 'localhost';
