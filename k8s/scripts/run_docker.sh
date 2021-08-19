@@ -12,10 +12,10 @@ echo "Building the docker image"
 # build the docker image
 docker build -t "$image_name" ../../.
 
-echo "Starting the app with kubernetes using deployment.yaml file for configuration"
+echo "Starting the app with kubernetes using local-deployment.yaml file for configuration"
 
-kubectl delete -f ../../deployment.yaml || true
+kubectl delete -f ../../local-deployment.yaml || true
 
-kubectl apply -f ../../deployment.yaml
+kubectl apply -f ../../local-deployment.yaml
 
 echo "Please manually verify the app via GET localhost:30001"
