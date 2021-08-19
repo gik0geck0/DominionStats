@@ -33,7 +33,9 @@ jobs:
           node-version: ${{ matrix.node-version }}
 
       - name: Run Unit Tests
-        run: npm run test:unit
+        run: |-
+          npm install
+          npm run test:unit
 
       - name: Setup Google Cloud CLI
         uses: google-github-actions/setup-gcloud@94337306dda8180d967a56932ceb4ddcf01edae7
