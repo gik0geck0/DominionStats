@@ -7,7 +7,7 @@ on:
 
 env:
   PROJECT_ID: ${{secrets.GKE_PROJECT}}
-  GKE_CLUSTER: ${{secrets.GKE_CLUSTER NAME}}
+  GKE_CLUSTER: ${{secrets.GKE_CLUSTERNAME}}
   GKE_ZONE: ${{secrets.GKE_ZONE}}
   DEPLOYMENT_NAME: domgame-deployment
   IMAGE: domgame-image
@@ -20,7 +20,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [12.x, 14.x]
+        node-version: [14.x]
 
     steps:
 
@@ -73,4 +73,6 @@ jobs:
           ./kustomize build . | kubectl apply -f -
           kubectl rollout status deployment/$DEPLOYMENT_NAME
           kubectl get services -o wide
+
+
 
