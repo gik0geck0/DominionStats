@@ -31,11 +31,16 @@ Access the app via `localhost:30001`.
 `kubectl delete -f ./k8s/specs/local-deployment.yaml` (assuming you are in the top-level directory)
 
 ## Quickstart to Deploy to GKE (Google Kubernetes Engine)
-## Before Beginning
+### Before Beginning
 1. Visit [GKE](https://console.cloud.google.com/projectselector2/kubernetes)
 2. Create/select a project
 3. Ensure the billing is enabled for your GCP project
-4. install the [Google Cloud SDK](https://cloud.google.com/sdk/docs/quickstarts)\
-5. install the Kubernetes command-line tool: `gcloud components install kubectl`
-6. set project defualts: `gcloud config set project [PROJECT_ID]``gcloud config set compute/zone us-central1-b`
+4. create a cluster via GKE
+5. Going into IAM > Service Accounts, generate a new key and save it as `GKE_SA_KEY` in Github secrets
+6. From the GCP Dashboard get the Project ID, and save it as `GKE_PROJECT` in Github secrets
+
+### CI/CD Pipline via Github Actions
+CI/CD is built into this repo. the pipline in defined under `/.github/workflows`. Container images are
+created under the connected GCP account and a new deployment and service are also executed, for every 
+push to branch main.
 
