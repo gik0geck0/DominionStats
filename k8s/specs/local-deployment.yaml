@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: dominion
-        image: dominion1:latest
+        image: dominionstats:latest
         imagePullPolicy: Never
 ---
 apiVersion: v1

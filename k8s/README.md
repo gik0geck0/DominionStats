@@ -2,7 +2,7 @@
 
 Files in this folder can be used to deploy this LWC app to a k8s cluster.
 
-## Perequisites
+## Prerequisites
 - Docker Desktop 
 - Enable Kubernetes Cluster in Docker Desktop: https://docs.docker.com/desktop/kubernetes/
 - Verify that you can see the `docker-desktop` cluster: `kubectl config view`
@@ -28,7 +28,7 @@ Access the app via `localhost:30001`.
 `kubectl get services`
 
 ### kill k8 clusters
-`kubectl delete -f local-deployment.yaml` (assuming you are in the top-level directory)
+`kubectl delete -f ./k8s/specs/local-deployment.yaml` (assuming you are in the top-level directory)
 
 ## Quickstart to Deploy to GKE (Google Kubernetes Engine)
 ## Before Beginning
