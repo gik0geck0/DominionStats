@@ -1,21 +1,34 @@
 import { LightningElement } from 'lwc';
 
-export default class HelloForEach extends LightningElement {
-    contacts = [
+export default class TestTable extends LightningElement {
+
+    tableData = getData();
+
+}
+
+function getData() {
+
+    //eventual function to return a processed list of data to place into the table
+
+    return [
         {
-            Id: '003171931112854375',
-            Name: 'Amy Taylor',
-            Title: 'COO',
+            date: "20200911a",
+            name: "Shelby",
+            ranking: 1,
+            victoryPoints: 53
         },
         {
-            Id: '003192301009134555',
-            Name: 'Michael Jones',
-            Title: 'CTO',
+            date: "20200911a",
+            name: "Troy",
+            ranking: 2,
+            victoryPoints: 38
         },
         {
-            Id: '003848991274589432',
-            Name: 'Jennifer Wu',
-            Title: 'CEO',
-        },
+            date: "20200911a",
+            name: "Joe",
+            ranking: 3,
+            victoryPoints: 27
+        }
     ];
+
 }

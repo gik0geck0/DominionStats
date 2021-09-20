@@ -1,15 +1,20 @@
 <template>
-    <ul>
-      <template for:each={contacts} for:item="contact">
-        <!-- <li key={contact.Id}>
-          <h1>{contact.Name}, {contact.Title}</h1>
-        </li> -->
 
-        <tr key={contact.Id}>
-            <td>{contact.Name}</td>
-            <td>{contact.Title}</td>
-        </tr>
+  <tr>
+    <th>Date</th>
+    <th>Name</th>
+    <th>Ranking</th>
+    <th>Victory Points</th>
+  </tr>
 
-      </template>
-    </ul>
+  <template for:each={tableData} for:item="entry">
+
+    <tr key={entry.name}>
+        <td>{entry.date}</td>
+        <td>{entry.name}</td>
+        <td>{entry.ranking}</td>
+        <td>{entry.victoryPoints}</td>
+    </tr>
+
+  </template>
 </template>
