@@ -43,9 +43,9 @@ echo "check on the pod statuses"
 echo "    kubectl get pods -n dominion"
 echo ""
 echo "follow app logs"
-echo "    kubectl logs --follow $(kubectl get pods -n dominion | grep '^dominion' | head -n 1 | awk '{print $1}') -n dominion -c dominion"
+echo "    kubectl logs --follow \$(kubectl get pods -n dominion | grep '^dominion' | head -n 1 | awk '{print \$1}') -n dominion -c dominion"
 echo ""
 echo "run sql against the DB"
-echo "    winpty kubectl exec -it $(kubectl get pods -n dominion | grep '^postgres' | head -n 1 | awk '{print $1}') -n dominion -c postgres -- env PGPASSWORD=$(kubectl get configmap postgres-config -n dominion -o yaml | grep '\spostgres_password: ' | awk '{print $2}') psql -U admin dominion"
+echo "    winpty kubectl exec -it \$(kubectl get pods -n dominion | grep '^postgres' | head -n 1 | awk '{print \$1}') -n dominion -c postgres -- env PGPASSWORD=\$(kubectl get configmap postgres-config -n dominion -o yaml | grep '\spostgres_password: ' | awk '{print \$2}') psql -U admin dominion"
 
 kubectl logs --follow $(kubectl get pods -n dominion | grep '^dominion' | head -n 1 | awk '{print $1}') -n dominion -c dominion

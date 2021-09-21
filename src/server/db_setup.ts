@@ -1,24 +1,24 @@
 import { Pool } from 'pg';
 import { migrate } from 'postgres-migrations';
 
-console.log("DB configured to pull from env vars: ", JSON.stringify(process.env));
-// Single global pool to be used for all queries
+/**
+ * Single global pool to be used for all queries
+ * Grabs connection info out of environment variables:
+ * PGUSER       default=??
+ * PGHOST       default=localhost
+ * PGPASSWORD   default=??
+ * PGDATABASE   default=postgres
+ * PGPORT       default=5432
+ */
 const pool = new Pool();
 
 async function init(): Promise<void> {
-    // wait until the database is available, give it a 10s head-start
-    console.log("Waiting for DB to start, beginning at " + new Date());
-    let retries = 0;
-    while (retries < 10) {
-        retries++;
-        // Validate connection
-        try {
-            await pool.query('SELECT NOW()');
-            break;
-        } catch (e) {
-            console.log("Failed to connect to DB on attempt " + retries + " time: " + new Date());
-            await new Promise((res) => setTimeout(res, 1000));
-        }
+    // Validate connection
+    try {
+        await pool.query('SELECT NOW()');
+    } catch (e) {
+        console.log("Failed to connect to DB: ", e);
+        throw e;
     }
 
     // Migrate the database schema
