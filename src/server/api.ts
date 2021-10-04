@@ -6,7 +6,10 @@ import path from 'path';
 
 // TODO: import queries from DB service
 import { testQueryAll, testQueryAll2 } from './db_setup';
-// import { testQueryAll, testQueryAll3 } from './db_setup';
+
+//Comment the above line and uncomment the below line to test table 3
+
+// import { testQueryAll, testQueryAll2, testQueryAll3 } from './db_setup';
 
 const app = express();
 app.use(compression());
@@ -42,7 +45,9 @@ app.get('/api/v1/testObjects2', async (req: any, res: any) => {
     res.json(await testQueryAll2());
 });
 
-// app.get('/api/v1/testObjects2', async (req: any, res: any) => {
+//Uncomment below to test table 3
+
+// app.get('/api/v1/testObjects3', async (req: any, res: any) => {
 //     res.json(await testQueryAll3());
 // });
 

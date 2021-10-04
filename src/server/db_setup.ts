@@ -47,12 +47,20 @@ interface TestObject {
     score: number;
 }
 
+export async function testQueryAll(): Promise<TestObject[]> {
+    const res = await pool.query("SELECT id, name, score FROM test_table") 
+    return res.rows as TestObject[];
+}
+
+//BA:
 interface TestObject2 {
     id: number;
     name: string;
     score: number;
     victoryPoints: number;
 }
+
+//Uncomment below to test table 3
 
 // interface TestObject3 {
 //     id: number;
@@ -62,15 +70,12 @@ interface TestObject2 {
 //     Victory_Points: number;
 // }
 
-export async function testQueryAll(): Promise<TestObject[]> {
-    const res = await pool.query("SELECT id, name, score FROM test_table") 
-    return res.rows as TestObject[];
-}
-
 export async function testQueryAll2(): Promise<TestObject2[]> {
     const res = await pool.query("SELECT id, name, score, victoryPoints FROM test_table_2");
     return res.rows as TestObject2[];
 }
+
+//Uncomment below to test table 3
 
 // export async function testQueryAll3(): Promise<TestObject3[]> {
 //     const res = await pool.query("SELECT id, Game_Label, Player_Num, Player_Name, Victory_Points FROM test_table_3");
