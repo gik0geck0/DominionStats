@@ -34,6 +34,7 @@ export default class Greeting extends LightningElement {
             this.animationSpeed = DEFAULT_SPEED;
         }
         this.isAnimating = true;
+        console.log(value);
     }
 
     // Return the internal speed property
