@@ -17,6 +17,9 @@ VALUES
     ('tanner', 40, 55)
     ;
 
+
+--Comment the code above and uncomment the code below to test query 3
+
 -- -- Create the basic table
 -- CREATE TABLE IF NOT EXISTS test_table_3 (
 --     id serial PRIMARY KEY,
