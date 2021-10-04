@@ -3,6 +3,7 @@ import { LightningElement, api } from 'lwc';
 export default class TestTable extends LightningElement {
 
     selectedTable = 0
+    tableData = this.getData();
 
     @api
     set table(value: string) {
