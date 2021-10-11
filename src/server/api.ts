@@ -5,11 +5,8 @@ import express from 'express';
 import path from 'path';
 
 // TODO: import queries from DB service
-// import { testQueryAll, testQueryAll2 } from './db_setup';
 
-//Comment the above line and uncomment the below line to test table 3
-
-import { testQueryAll, testQueryAll2, testQueryAll3 } from './db_setup';
+import { testQueryAll, testQueryAll2} from './db_setup';
 
 const app = express();
 app.use(compression());
@@ -40,15 +37,8 @@ app.get('/api/v1/testObjects', async (req: any, res: any) => {
     res.json(await testQueryAll());
 });
 
-//BA:
-app.get('/api/v1/testObjects2', async (req: any, res: any) => {
+app.get('/api/v1/gameLogs', async (req: any, res: any) => {
     res.json(await testQueryAll2());
-});
-
-//Uncomment below to test table 3
-
-app.get('/api/v1/testObjects3', async (req: any, res: any) => {
-    res.json(await testQueryAll3());
 });
 
 // Serve LWC content

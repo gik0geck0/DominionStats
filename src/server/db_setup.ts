@@ -12,6 +12,7 @@ import { migrate } from 'postgres-migrations';
  */
 const pool = new Pool();
 
+//for importing from csv file
 const fs = require("fs");
 const fastcsv = require("fast-csv");
 
@@ -36,6 +37,40 @@ async function init(): Promise<void> {
         // release the client back to the pool when we're done
         await client.release();
     }
+
+    //for importing game logs from csv file
+    var stream = fs.createReadStream("/app/db-migrations/GameLogs.csv");
+    var csvData: any[] = [];
+    var csvStream = fastcsv
+    .parse()
+    .on("data", function(data: any) {
+        csvData.push(data);
+    })
+    .on("end", function() {
+        // remove the first line: header
+        csvData.shift();
+
+        const query = "INSERT INTO game_logs (game_label, player_num, player_name, victory_points) VALUES ($1, $2, $3, $4)";
+
+        pool.connect((err, client, done) => {
+            if (err) throw err;
+            try {
+              csvData.forEach(row => {
+                client.query(query, row, (err, res) => {
+                  if (err) {
+                    console.log(err.stack);
+                  } else {
+                    // console.log("inserted " + res.rowCount + " row:", row);
+                  }
+                });
+              });
+            } finally {
+              done();
+            }
+        });
+    });
+    stream.pipe(csvStream);
+
 }
 
 // Verify connection and run migrations on startup
@@ -50,79 +85,20 @@ interface TestObject {
     score: number;
 }
 
+interface TestObject2 {
+    id: number;
+    game_label: string;
+    player_num: number;
+    player_name: string;
+    victory_points: number;
+}
+
 export async function testQueryAll(): Promise<TestObject[]> {
     const res = await pool.query("SELECT id, name, score FROM test_table") 
     return res.rows as TestObject[];
 }
 
-//BA:
-interface TestObject2 {
-    id: number;
-    name: string;
-    score: number;
-    victoryPoints: number;
-}
-
-//Uncomment below to test table 3
-
-interface TestObject3 {
-    id: number;
-    Game_Label: string;
-    Player_Num: number;
-    Player_Name: string;
-    Victory_Points: number;
-}
-
 export async function testQueryAll2(): Promise<TestObject2[]> {
-    const res = await pool.query("SELECT id, name, score, victoryPoints FROM test_table_2");
+    const res = await pool.query("SELECT id, game_label, player_num, player_name, victory_points FROM game_logs");
     return res.rows as TestObject2[];
-}
-
-//Uncomment below to test table 3
-
-// export async function testQueryAll3(): Promise<TestObject3[]> {
-//     const res = await pool.query("SELECT id, Game_Label, Player_Num, Player_Name, Victory_Points FROM test_table_3");
-//     return res.rows as TestObject3[];
-// }
-
-export async function testQueryAll3(): Promise<TestObject3[]> {
-    let stream = fs.createReadStream("/app/db-migrations/Test1.csv");
-    let csvData: any[];
-    let csvStream = fastcsv
-    .parse()
-    .on("data", function(data: any) {
-        console.log(data);
-        csvData.push(data);
-    })
-    .on("end", function() {
-        // remove the first line: header
-        csvData.shift();
-        const query = "INSERT INTO test_table_3 (id, game_label, player_num, player_name, victory_points) VALUES ($1, $2, $3, $4, $5)";
-
-        pool.connect((err, client, done) => {
-            if (err) throw err;
-      
-            try {
-              csvData.forEach(row => {
-                client.query(query, row, (err, res) => {
-                  if (err) {
-                    console.log(err.stack);
-                  } else {
-                    console.log("inserted " + res.rowCount + " row:", row);
-                  }
-                });
-              });
-            } finally {
-              done();
-            }
-
-        // connect to the PostgreSQL database
-        // save csvData
-        });
-    });
-  
-    stream.pipe(csvStream);
-
-    const res = await pool.query("SELECT id, game_label, player_num, player_name, victory_points FROM test_table_3");
-    return res.rows as TestObject3[];
 }
