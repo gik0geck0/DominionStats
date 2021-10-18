@@ -48,6 +48,7 @@ async function init(): Promise<void> {
     const gameResults = await pool.query("SELECT game_label FROM game_results");
     const fillTable = gameResults.rows;
 
+    //if the rows are empty, fill with raw data
     if (fillTable.length < 1) {
         const csvStream = fastcsv
         .parse()
