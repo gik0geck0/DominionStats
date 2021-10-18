@@ -4,8 +4,7 @@ import helmet from 'helmet';
 import express from 'express';
 import path from 'path';
 
-// TODO: import queries from DB service
-
+//to import queries from DB service
 import { testQueryAll, testQueryAll2} from './db_setup';
 
 const app = express();
