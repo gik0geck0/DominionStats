@@ -60,13 +60,13 @@ async function init(): Promise<void> {
 
             const query = "INSERT INTO game_results (game_label, player_num, player_name, victory_points) VALUES ($1, $2, $3, $4)";
 
-            pool.connect((err, client, done) => {
+            pool.connect((err, c, done) => {
                 if (err) throw err;
                 try {
                 csvData.forEach(row => {
-                    client.query(query, row, (err, res) => {
-                    if (err) {
-                        console.log(err.stack);
+                    client.query(query, row, (error) => {
+                    if (error) {
+                        console.log(error.stack);
                     }
                     });
                 });
@@ -77,10 +77,6 @@ async function init(): Promise<void> {
         });
         stream.pipe(csvStream);
     }
-    // else {
-    //     console.log("Table is full");
-    //     console.log(gameResults.rows[0]);
-    // }
 }
 
 // Verify connection and run migrations on startup
