@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS game_logs (
+CREATE TABLE IF NOT EXISTS game_results (
     id serial PRIMARY KEY,
     game_label VARCHAR(255) NOT NULL,
     player_num INT,

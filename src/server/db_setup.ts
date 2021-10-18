@@ -38,39 +38,49 @@ async function init(): Promise<void> {
         await client.release();
     }
 
+   
+
     //for importing game logs from csv file
-    var stream = fs.createReadStream("/app/db-migrations/GameLogs.csv");
-    var csvData: any[] = [];
-    var csvStream = fastcsv
-    .parse()
-    .on("data", function(data: any) {
-        csvData.push(data);
-    })
-    .on("end", function() {
-        // remove the first line: header
-        csvData.shift();
+    const stream = fs.createReadStream("/app/db-migrations/GameLogs.csv");
+    const csvData: any[] = [];
 
-        const query = "INSERT INTO game_logs (game_label, player_num, player_name, victory_points) VALUES ($1, $2, $3, $4)";
+    //to ensure that data is only inserted once
+    const gameResults = await pool.query("SELECT game_label FROM game_results");
+    const fillTable = gameResults.rows;
 
-        pool.connect((err, client, done) => {
-            if (err) throw err;
-            try {
-              csvData.forEach(row => {
-                client.query(query, row, (err, res) => {
-                  if (err) {
-                    console.log(err.stack);
-                  } else {
-                    // console.log("inserted " + res.rowCount + " row:", row);
-                  }
+    if (fillTable.length < 1) {
+        const csvStream = fastcsv
+        .parse()
+        .on("data", function(data: any) {
+            csvData.push(data);
+        })
+        .on("end", function() {
+            // remove the first line: header
+            csvData.shift();
+
+            const query = "INSERT INTO game_results (game_label, player_num, player_name, victory_points) VALUES ($1, $2, $3, $4)";
+
+            pool.connect((err, client, done) => {
+                if (err) throw err;
+                try {
+                csvData.forEach(row => {
+                    client.query(query, row, (err, res) => {
+                    if (err) {
+                        console.log(err.stack);
+                    }
+                    });
                 });
-              });
-            } finally {
-              done();
-            }
+                } finally {
+                done();
+                }
+            });
         });
-    });
-    stream.pipe(csvStream);
-
+        stream.pipe(csvStream);
+    }
+    // else {
+    //     console.log("Table is full");
+    //     console.log(gameResults.rows[0]);
+    // }
 }
 
 // Verify connection and run migrations on startup
@@ -85,7 +95,7 @@ interface TestObject {
     score: number;
 }
 
-interface TestObject2 {
+interface GameResults {
     id: number;
     game_label: string;
     player_num: number;
@@ -98,7 +108,7 @@ export async function testQueryAll(): Promise<TestObject[]> {
     return res.rows as TestObject[];
 }
 
-export async function testQueryAll2(): Promise<TestObject2[]> {
-    const res = await pool.query("SELECT id, game_label, player_num, player_name, victory_points FROM game_logs");
-    return res.rows as TestObject2[];
+export async function testQueryAll2(): Promise<GameResults[]> {
+    const res = await pool.query("SELECT id, game_label, player_num, player_name, victory_points FROM game_results");
+    return res.rows as GameResults[];
 }
