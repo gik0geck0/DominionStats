@@ -1,12 +1,5 @@
 <template>
-    <!-- LWC sample component <my-greeting> -->
-    <!-- <div class="center greeting"> -->
-        <!-- <my-greeting speed="slow"></my-greeting> -->
-        <!-- <my-greeting speed="fast"></my-greeting> -->
-        <!-- <my-greeting speed="fast"></my-greeting> -->
-    <!-- </div> -->
 
-    <!-- Testing lightning components -->
     <div class="center">
 
         <lightning-tabset>
@@ -14,7 +7,7 @@
                 <lightning-card title="Raw Results">
                     
                     <div class="center">
-                        <my-general-table table="1"></my-general-table>
+                        <my-raw-results-table></my-raw-results-table>
                     </div>
 
                 </lightning-card>
@@ -23,20 +16,11 @@
                 <lightning-card title="Game Results">
                     <div class="center">
 
-                        <my-game-table></my-game-table>
+                        <my-player-ranking-table></my-player-ranking-table>
 
                     </div>
                 </lightning-card>
             </lightning-tab>
-            <!-- <lightning-tab label="Players">
-                <lightning-card title="Player Statistics">
-                    <div class="center">
-
-
-
-                    </div>
-                </lightning-card>
-            </lightning-tab> -->
         </lightning-tabset>
     </div>
 

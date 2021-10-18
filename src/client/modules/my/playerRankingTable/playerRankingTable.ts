@@ -1,6 +1,6 @@
 import { LightningElement } from 'lwc';
 
-export default class TestTable extends LightningElement {
+export default class PlayerRankingTable extends LightningElement {
 
     tableData = this.getData();
 
