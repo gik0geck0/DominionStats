@@ -13,11 +13,11 @@
 
     <tbody>
       <template for:each={tableData} for:item="entry">
-        <tr key={entry.name} class="slds-hint-parent">
-            <td>{entry.date}</td>
-            <td>{entry.name}</td>
-            <td>{entry.ranking}</td>
-            <td>{entry.victoryPoints}</td>
+        <tr key={entry.id} class="slds-hint-parent">
+            <td>{entry.game_label}</td>
+            <td>{entry.player_name}</td>
+            <td>{entry.player_num}</td>
+            <td>{entry.victory_points}</td>
         </tr>
       </template>
     </tbody>
