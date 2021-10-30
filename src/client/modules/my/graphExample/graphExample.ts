@@ -41,6 +41,7 @@ const placeNumberToString = ['Zeroth', 'First', 'Second', 'Third', 'Fourth', 'Fi
 export default class GraphExample extends LightningElement {
     victoryPointTrendData = [];
     placeFrequencyData = [];
+    hasRendered = false;
 
     async renderedCallback() {
         // Avoids some infinite loop of trying to re-render. No idea why
