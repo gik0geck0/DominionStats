@@ -1,3 +1,29 @@
+.pretty_header {
+    height: 150px;
+    border: none;
+    padding: 10px;
+    background-image: url('/assets/images/DominionHeader4.jpg');
+    background-repeat: no-repeat;
+    background-size: 100%;
+    line-height: 130px;
+    color: white;
+    font-size: 50px;
+    font-family: 'Luminari';
+    letter-spacing: 8px;
+    /* creates a 3D effect */
+    text-shadow: 
+    1px 0px white,
+    -1px 0px black,
+    2px 0px white,
+    -2px 0px black,
+    3px 0px white,
+    -3px 0px black,
+    4px 0px white,
+    -4px 0px black,
+    5px 0px white,
+    -5px 0px black;
+}
+
 .center {
     text-align: center;
 }
