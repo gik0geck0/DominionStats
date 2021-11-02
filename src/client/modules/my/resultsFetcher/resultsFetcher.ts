@@ -9,21 +9,21 @@ interface GameResultsData {
 interface PlayerStatsAllGames {
     player_name: string;
     num_games: number;
-    percent_played: string;
+    percent_played: number;
     total_victory_points: number;
-    avg_points: string;
+    avg_points: number;
     first_place: number;
-    percent_first: string;
+    percent_first: number;
     second_place: number;
-    percent_second: string;
+    percent_second: number;
     third_place: number;
-    percent_third: string;
+    percent_third: number;
     fourth_place: number;
-    percent_fourth: string;
+    percent_fourth: number;
     fifth_place: number;
-    percent_fifth: string;
+    percent_fifth: number;
     sixth_place: number;
-    percent_sixth: string;
+    percent_sixth: number;
 }
 
 let cachedData: GameResultsData[] = [];
@@ -46,18 +46,18 @@ export function getRawResults(): Promise<GameResultsData[]> {
 export function extractPlayerStats(resultsData: GameResultsData[]): PlayerStatsAllGames[] {
     let PlayerStats: PlayerStatsAllGames[] = [];
     let total = 0;
-   for (var i in resultsData){
-       if(!PlayerStats.find(o => o.player_name == resultsData[i].player_name)){
-        PlayerStats.push({player_name: resultsData[i].player_name,first_place: 0,percent_first: "",percent_second: "",percent_third:"",percent_fourth:"",percent_fifth:"",percent_sixth:"",avg_points: "",percent_played: "", total_victory_points: 0, num_games: 0,second_place: 0,third_place: 0,fourth_place: 0, fifth_place: 0,sixth_place: 0})
+    resultsData.forEach((entry, i) => {
+       if(!PlayerStats.find(o => o.player_name == entry.player_name)){
+        PlayerStats.push({player_name: entry.player_name,first_place: 0,percent_first: 0,percent_second: 0,percent_third:0,percent_fourth:0,percent_fifth:0,percent_sixth:0,avg_points: 0,percent_played: 0, total_victory_points: 0, num_games: 0,second_place: 0,third_place: 0,fourth_place: 0, fifth_place: 0,sixth_place: 0})
        }
-       if(resultsData[i].player_num == 1){
+       if(entry.player_num == 1){
            total++;
        }
        for (var j in PlayerStats){
-            if(PlayerStats[j].player_name == resultsData[i].player_name){
+            if(PlayerStats[j].player_name == entry.player_name){
                 PlayerStats[j].num_games++;
                 PlayerStats[j].total_victory_points += resultsData[i].victory_points;
-                switch (resultsData[i].player_num) {
+                switch (entry.player_num) {
                     case 1:
                         PlayerStats[j].first_place++;
                         break;
@@ -80,22 +80,22 @@ export function extractPlayerStats(resultsData: GameResultsData[]): PlayerStatsA
                 
             }
             let avg = PlayerStats[j].total_victory_points/PlayerStats[j].num_games;
-            PlayerStats[j].avg_points = avg.toFixed(2);
+            PlayerStats[j].avg_points = +avg.toFixed(2);
             let games_played = (PlayerStats[j].num_games/total)*100;
-            PlayerStats[j].percent_played = games_played.toFixed(2);
-            let first = (PlayerStats[j].first_place/PlayerStats[j].num_games)*100;
-            PlayerStats[j].percent_first = first.toFixed(2);
-            let second = (PlayerStats[j].second_place/PlayerStats[j].num_games)*100;
-            PlayerStats[j].percent_second = second.toFixed(2);
-            let third = (PlayerStats[j].third_place/PlayerStats[j].num_games)*100;
-            PlayerStats[j].percent_third = third.toFixed(2);
-            let fourth = (PlayerStats[j].fourth_place/PlayerStats[j].num_games)*100;
-            PlayerStats[j].percent_fourth = fourth.toFixed(2);
-            let fifth = (PlayerStats[j].fifth_place/PlayerStats[j].num_games)*100;
-            PlayerStats[j].percent_fifth = fifth.toFixed(2);
-            let sixth = (PlayerStats[j].sixth_place/PlayerStats[j].num_games)*100;
-            PlayerStats[j].percent_sixth = sixth.toFixed(2);
+            PlayerStats[j].percent_played = +games_played.toFixed(2);
+            let first = (PlayerStats[j].first_place/total)*100;
+            PlayerStats[j].percent_first = +first.toFixed(2);
+            let second = (PlayerStats[j].second_place/total)*100;
+            PlayerStats[j].percent_second = +second.toFixed(2);
+            let third = (PlayerStats[j].third_place/total)*100;
+            PlayerStats[j].percent_third = +third.toFixed(2);
+            let fourth = (PlayerStats[j].fourth_place/total)*100;
+            PlayerStats[j].percent_fourth = +fourth.toFixed(2);
+            let fifth = (PlayerStats[j].fifth_place/total)*100;
+            PlayerStats[j].percent_fifth = +fifth.toFixed(2);
+            let sixth = (PlayerStats[j].sixth_place/total)*100;
+            PlayerStats[j].percent_sixth = +sixth.toFixed(2);
        }
-   }
+   },PlayerStats);
    return PlayerStats;
 }

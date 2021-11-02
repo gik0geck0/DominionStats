@@ -5,8 +5,8 @@
     <thead>
       <tr class="slds-line-height_reset">
         <th>Date</th>
-        <th>Name</th>
         <th>Ranking</th>
+        <th>Name</th>
         <th>Victory Points</th>
       </tr>
     </thead>
@@ -15,8 +15,8 @@
       <template for:each={tableData} for:item="entry">
         <tr key={entry.id} class="slds-hint-parent">
             <td>{entry.game_label}</td>
-            <td>{entry.player_name}</td>
             <td>{entry.player_num}</td>
+            <td>{entry.player_name}</td>
             <td>{entry.victory_points}</td>
         </tr>
       </template>

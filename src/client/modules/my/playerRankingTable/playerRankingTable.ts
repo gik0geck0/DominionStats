@@ -1,6 +1,5 @@
 import { LightningElement } from 'lwc';
-import { getRawResults } from 'my/resultsFetcher';
-import { extractPlayerStats } from 'my/resultsFetcher';
+import { extractPlayerStats, getRawResults } from 'my/resultsFetcher';
 
 
 export default class PlayerRankingTable extends LightningElement {
@@ -9,8 +8,9 @@ export default class PlayerRankingTable extends LightningElement {
     async connectedCallback() {
         this.tableData = extractPlayerStats(await getRawResults());
     }
-
 }
+
+
 
 
 
