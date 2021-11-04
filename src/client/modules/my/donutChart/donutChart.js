@@ -3,7 +3,7 @@ import { DonutChart } from 'my/d3Charts';
 
 export default class ConnectedScatterGraph extends LightningElement {
 
-    @api graphTitle = "Place Frequency Graph";
+    @api title = "Place Frequency Graph";
 
     // Must be in the form [{name: string, value: number}]
     // Using a setter gives us a reactive hook to re-render the graph if the data changes
@@ -32,7 +32,6 @@ export default class ConnectedScatterGraph extends LightningElement {
       if (!this.hasRendered)
         return;
 
-      console.log("DonutChart with data:", this._data);
       const csElement = DonutChart(this._data, {
           name: d => d.name,
           value: d => d.value,
