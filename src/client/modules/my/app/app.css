@@ -1,26 +1,31 @@
 .pretty_header {
-    height: 150px;
+    text-align: center;
+    height: 140px;
     border: none;
     padding: 10px;
-    background-image: url('/assets/images/DominionHeader4.jpg');
+    background-image: url('/assets/images/NewDomHeader3Crop3.jpg');
     background-repeat: no-repeat;
     background-size: 100%;
     line-height: 130px;
-    color: white;
+    /* color: white; */
+    /* color: #1c3eff; */
+    color: #e4f2f8;
     font-size: 50px;
     font-family: 'Luminari';
-    letter-spacing: 8px;
+    letter-spacing: 5px;
     /* creates a 3D effect */
+    /* text-shadow: 
+    -1px 0px #1F0000,
+    -2px 0px #1F0000,
+    -3px 0px #1F0000,
+    -4px 0px #1F0000, */
+    /* -5px 0px #1F0000; */
+
     text-shadow: 
-    1px 0px white,
     -1px 0px black,
-    2px 0px white,
     -2px 0px black,
-    3px 0px white,
     -3px 0px black,
-    4px 0px white,
     -4px 0px black,
-    5px 0px white,
     -5px 0px black;
 }
 
