@@ -1,20 +1,58 @@
 <template>
 
-    <form>
+    <label for="gameId">Game ID:</label>
+    <input type="text" name="gameId">
 
-        <my-player-select-combo></my-player-select-combo>
+    <br>
 
-        <label for="gameId">Date:</label>
-        <input type="text" id="gameId">
+    <label for="playerName">Player 1 Name:</label>
+    <input type="text" name="playerName1">
 
-        <label for="playerName">Player name:</label>
-        <input type="text" id="playerName">
+    <label for="victoryPoints">Victory points:</label>
+    <input type="text" name="victoryPoints1">
 
-        <label for="victoryPoints">Victory points:</label>
-        <input type="text" id="victoryPoints">
+    <br>
 
-        <lightning-button label="Submit" variant="brand-outline" onclick={handleClick}></lightning-button>
+    <label for="playerName">Player 2 Name:</label>
+    <input type="text" name="playerName2">
 
-    </form>
+    <label for="victoryPoints">Victory points:</label>
+    <input type="text" name="victoryPoints2">
+
+    <br>
+
+    <label for="playerName">Player 3 Name:</label>
+    <input type="text" name="playerName3">
+
+    <label for="victoryPoints">Victory points:</label>
+    <input type="text" name="victoryPoints3">
+
+    <br>
+
+    <label for="playerName">Player 4 Name:</label>
+    <input type="text" name="playerName4">
+
+    <label for="victoryPoints">Victory points:</label>
+    <input type="text" name="victoryPoints4">
+
+    <br>
+
+    <label for="playerName">Player 5 Name:</label>
+    <input type="text" name="playerName5">
+
+    <label for="victoryPoints">Victory points:</label>
+    <input type="text" name="victoryPoints5">
+
+    <br>
+
+    <label for="playerName">Player 6 Name:</label>
+    <input type="text" name="playerName6">
+
+    <label for="victoryPoints">Victory points:</label>
+    <input type="text" name="victoryPoints6">
+
+    <br>
+
+    <lightning-button label="Submit" variant="brand-outline" onclick={gatherDataAndSend}></lightning-button>
 
 </template>
