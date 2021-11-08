@@ -17,13 +17,33 @@ export default class DataUploader extends LightningElement {
             });
         }
 
-        //post data
+        //data for post
         let data = {
             "gameId": this.getValueFromInput("gameId"),
             "playerData": playerData
         };
 
         console.log(data);
+        console.log(JSON.stringify(data));
+
+        //send POST request to api
+        fetch("api/v1/gameLogs", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            console.log("Got response: ", response);
+            return response.json();
+        })
+        .then(returnedData => {
+            console.log("Successfully uploaded: ", returnedData);
+        })
+        .catch((error) => {
+            console.log("Error uploading data: ", error);
+        });
 
     }
 
