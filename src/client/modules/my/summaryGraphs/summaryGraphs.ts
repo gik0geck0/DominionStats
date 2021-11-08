@@ -15,9 +15,15 @@ interface DonutData {
     value: number;
 }
 
+interface PointsData {
+    player_name: string;
+    total_victory_points: number;
+}
+
 export default class SummaryGraphs extends LightningElement {
     gameParticipationTrendData: PlayersPerGame[] = [];
     firstPlaceFreqDonutData: DonutData[] = [];
+    totalPointsWonBarData: PointsData[] = [];
     hasRendered = false;
     scalePoint = d3.scalePoint;
 
@@ -27,6 +33,11 @@ export default class SummaryGraphs extends LightningElement {
             this.hasRendered = true;
             const rawResults: GameResultsData[] = await getRawResults();
             const playerOverviewStats: PlayerStatsAllGames[] = extractPlayerStats(rawResults);
+
+            // playerOverviewStats.forEach(async function(stat) {
+            //     let str = JSON.stringify(stat);
+            //     console.log(str);
+            //     })
 
             // Most Frequent First Place
             this.firstPlaceFreqDonutData = playerOverviewStats
@@ -52,6 +63,22 @@ export default class SummaryGraphs extends LightningElement {
                 return accum;
             }, {});
             this.gameParticipationTrendData = Object.entries(playersPerGame).map(([key, value]) => { return {game_label: key, player_num: value}});
+
+            //Total Points Won
+            this.totalPointsWonBarData = Object.entries(playerOverviewStats).map(([key, value]) => {return {player_name: key, total_victory_points: value}});
+
+            // this.totalPointsWonBarData = playerOverviewStats
+            //     .filter(bs => bs.total_victory_points > 0)
+            //     .map((bs) => {return {name: bs.player_name, value: bs.total_victory_points}; })
+            //     .sort((a,b) => {
+            //         if (a.value < b.value) {
+            //             return -1;
+            //         } else if (a.value > b.value) {
+            //             return 1;
+            //         }
+            //         return 0;
+            //     });
+
         } else {
             console.log("Blocked a re-render propagation");
         }
