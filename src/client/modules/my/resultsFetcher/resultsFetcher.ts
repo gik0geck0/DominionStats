@@ -27,6 +27,7 @@ export interface PlayerStatsAllGames {
 }
 
 let cachedData: GameResultsData[] = [];
+type PlayersPerGame = Pick<GameResultsData, "game_label" | "player_num">;
 
 export function getRawResults(): Promise<GameResultsData[]> {
     if (cachedData && !cachedData.length) {
@@ -43,10 +44,33 @@ export function getRawResults(): Promise<GameResultsData[]> {
     return new Promise((resolve) => resolve(cachedData));
 }
 
-export function extractPlayerStats(resultsData: GameResultsData[]): PlayerStatsAllGames[] {
+
+export function extractPlayerStats(resultsData: GameResultsData[],game_size: number): PlayerStatsAllGames[] {
     let PlayerStats: PlayerStatsAllGames[] = [];
+    // Game size array
+    let gameSize: PlayersPerGame[] = [];
+    const playersPerGame = resultsData.reduce((accum, gd: GameResultsData) => {
+        const {game_label} = gd;
+        if (!accum[game_label]) {
+            accum[game_label] = 1;
+        } else {
+            accum[game_label]++;
+        }
+        return accum;
+        
+    }, {});
+    this.gameSize = Object.entries(playersPerGame).map(([key, value]) => { return {game_label: key, player_num: value}});
+    let rawDataFiltered: GameResultsData[] = []
+    // if game size is between 2-6 filter for only games of that player size else return all data
+    if(game_size >= 2 && game_size <=6){
+        let filteredGameSize = this.gameSize.filter(game => game.player_num === game_size);
+        rawDataFiltered = resultsData.filter(({game_label: id1}) => filteredGameSize.some(({game_label: id2}) => id1 === id2));
+    } else {
+        rawDataFiltered = resultsData;
+    }
+    //calculate stats
     let total = 0;
-    resultsData.forEach((entry, i) => {
+    rawDataFiltered.forEach((entry, i) => {
        if(!PlayerStats.find(o => o.player_name == entry.player_name)){
         PlayerStats.push({player_name: entry.player_name,first_place: 0,percent_first: 0,percent_second: 0,percent_third:0,percent_fourth:0,percent_fifth:0,percent_sixth:0,avg_points: 0,percent_played: 0, total_victory_points: 0, num_games: 0,second_place: 0,third_place: 0,fourth_place: 0, fifth_place: 0,sixth_place: 0})
        }
@@ -56,7 +80,7 @@ export function extractPlayerStats(resultsData: GameResultsData[]): PlayerStatsA
        for (var j in PlayerStats){
             if(PlayerStats[j].player_name == entry.player_name){
                 PlayerStats[j].num_games++;
-                PlayerStats[j].total_victory_points += resultsData[i].victory_points;
+                PlayerStats[j].total_victory_points += entry.victory_points;
                 switch (entry.player_num) {
                     case 1:
                         PlayerStats[j].first_place++;

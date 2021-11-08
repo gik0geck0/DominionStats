@@ -26,7 +26,7 @@ export default class SummaryGraphs extends LightningElement {
         if (!this.hasRendered) {
             this.hasRendered = true;
             const rawResults: GameResultsData[] = await getRawResults();
-            const playerOverviewStats: PlayerStatsAllGames[] = extractPlayerStats(rawResults);
+            const playerOverviewStats: PlayerStatsAllGames[] = extractPlayerStats(rawResults,1);
 
             // Most Frequent First Place
             this.firstPlaceFreqDonutData = playerOverviewStats

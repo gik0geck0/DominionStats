@@ -6,7 +6,7 @@ export default class PlayerRankingTable extends LightningElement {
 
     tableData = [];
     async connectedCallback() {
-        this.tableData = extractPlayerStats(await getRawResults());
+        this.tableData = extractPlayerStats(await getRawResults(),1);
     }
 }
 
