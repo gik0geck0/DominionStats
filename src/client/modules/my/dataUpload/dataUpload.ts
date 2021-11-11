@@ -7,6 +7,8 @@ export default class DataUploader extends LightningElement {
      */
     gatherDataAndSend() {
 
+        console.log("HELLO")
+
         let playerData = []; //data for each player input
 
         //get entered player data
@@ -27,7 +29,7 @@ export default class DataUploader extends LightningElement {
         console.log(JSON.stringify(data));
 
         //send POST request to api
-        fetch("api/v1/gameLogs", {
+        fetch("api/v1/gameResultsTest", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

@@ -5,9 +5,10 @@ import express from 'express';
 import path from 'path';
 
 //to import queries from DB service
-// import { testQueryAll, testQueryAll2} from './db_setup';
-import { any } from 'sequelize/types/lib/operators';
-import { testQueryAll, testQueryAll2, testQueryAll3} from './db_setup';
+import { testQueryAll, testQueryAll2} from './db_setup';
+// import { any } from 'sequelize/types/lib/operators';
+// import { testQueryAll3 } from './db_setup';
+import { testQueryAll4 } from './db_setup';
 
 const app = express();
 app.use(compression());
@@ -38,7 +39,7 @@ app.get('/api/v1/testObjects', async (req: any, res: any) => {
     res.json(await testQueryAll());
 });
 
-app.get('/api/v1/gameLogs', async (req: any, res: any) => {
+app.get('/api/v1/gameResults', async (req: any, res: any) => {
     res.json(await testQueryAll2());
 });
 
@@ -46,33 +47,22 @@ app.get('/api/v1/gameLogs', async (req: any, res: any) => {
 //     res.json(await testQueryAll3());
 // });
 
-// Example POST method implementation:
-async function postData(url = '', data = {}) {
-    // Default options are marked with *
-    const response = await fetch(url, {
-      method: 'POST', // *GET, POST, PUT, DELETE, etc.
-      mode: 'cors', // no-cors, *cors, same-origin
-      cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-      credentials: 'same-origin', // include, *same-origin, omit
-      headers: {
-        'Content-Type': 'application/json'
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      redirect: 'follow', // manual, *follow, error
-      referrerPolicy: 'no-referrer', // no-referrer, *no-referrer-when-downgrade, origin, origin-when-cross-origin, same-origin, strict-origin, strict-origin-when-cross-origin, unsafe-url
-      body: JSON.stringify(data) // body data type must match "Content-Type" header
-    });
-    return response.json(); // parses JSON response into native JavaScript objects
-  }
-
-postData('/api/v1/gameLogs', { req: any, res: any })
-  .then(data => {
-    console.log(data); // JSON data parsed by `data.json()` call
+app.get('/api/v1/gameResultsTest', async (req: any, res: any) => {
+    res.json(await testQueryAll4());
 });
 
-app.post('/api/v1/gameLogs', async (req: any, res: any) => {
+app.post('/api/v1/gameResultsTest', (req, res) => {
+    console.log('Got body:', req.body);
     
+    
+    
+    // res.json(testQueryAll3(req));
 });
+
+// app.post('/post-test', (req, res) => {
+//     console.log('Got body:', req.body);
+//     res.sendStatus(200);
+// });
 
 // Serve LWC content
 app.use(express.static(DIST_DIR));

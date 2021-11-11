@@ -65,7 +65,7 @@ export default class SummaryGraphs extends LightningElement {
             this.gameParticipationTrendData = Object.entries(playersPerGame).map(([key, value]) => { return {game_label: key, player_num: value}});
 
             //Total Points Won
-            this.totalPointsWonBarData = Object.entries(playerOverviewStats).map(([key, value]) => {return {player_name: key, total_victory_points: value}});
+            // this.totalPointsWonBarData = Object.entries(playerOverviewStats).map(([key, value]) => {return {player_name: key, total_victory_points: value}});
 
             // this.totalPointsWonBarData = playerOverviewStats
             //     .filter(bs => bs.total_victory_points > 0)

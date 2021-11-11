@@ -48,7 +48,7 @@ export default class ConnectedScatterGraph extends LightningElement {
       // Pass it to the d3 wrapper function
       const xFn = (d) => d[this.xkey];
       const yFn = (d) => d[this.ykey];
-      const csElement = ConnectedScatterplot(data, {
+      const csElement = BarGraph(data, {
           xLabel: this.xlabel,
           x: xFn,
           xType: this.xtype, // scalePoint is an ordered list of strings

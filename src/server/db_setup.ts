@@ -130,13 +130,13 @@ interface GameResults {
     victory_points: number;
 }
 
-// interface DataUpload {
-//     id: number;
-//     game_label: string;
-//     player_num: number;
-//     player_name: string;
-//     victory_points: number;
-// }
+interface DataUpload {
+    id: number;
+    game_label: string;
+    player_num: number;
+    player_name: string;
+    victory_points: number;
+}
 
 export async function testQueryAll(): Promise<TestObject[]> {
     const res = await pool.query("SELECT id, name, score FROM test_table") 
@@ -148,27 +148,34 @@ export async function testQueryAll2(): Promise<GameResults[]> {
     return res.rows as GameResults[];
 }
 
-export async function testQueryAll3(req: any, res: any): Promise<GameResults[]> {
-    const query = "INSERT INTO game_results (game_label, player_num, player_name, victory_points) VALUES ($1, $2, $3, $4)";
 
-            pool.connect((err, c, done) => {
-                if (err) throw err;
-                try {
-                req.forEach(row => {
-                    client.query(query, row, (error) => {
-                    if (error) {
-                        console.log(error.stack);
-                    }
-                    });
-                });
-                } finally {
-                done();
-                }
+// export async function testQueryAll3(req: any): Promise<DataUpload[]> {
+//     const query = "INSERT INTO data_upload (player_name, victory_points) VALUES ($3, $4)";
+//     const Game_Results = req.body;
 
-    // const res = await pool.query("SELECT id, game_label, player_num, player_name, victory_points FROM data_upload");
-    return res.rows as GameResults[];
-}
+//     Game_Results.forEach((result: any) => {
+//         pool.query(query, result, (error) => {
+//         if (error) {
+//             console.log(error.stack);
+//         }
+//         });
+//     });
+
+//     const res = await pool.query("SELECT id, game_label, player_num, player_name, victory_points FROM data_upload");
+
+//     // const res = await pool.query("SELECT id, game_label, player_num, player_name, victory_points FROM game_results");
+
+    
+
+//     // const res = await pool.query("SELECT id, game_label, player_num, player_name, victory_points FROM data_upload");
+//     return res.rows;
+// }
 
 //figure out how to insert data into table from upload data form
 //and then reload page for it to show up
 //and then work on charts
+
+export async function testQueryAll4(): Promise<DataUpload[]> {
+    const res = await pool.query("SELECT id, game_label, player_num, player_name, victory_points FROM data_upload");
+    return res.rows as DataUpload[];
+}
