@@ -24,26 +24,34 @@ export default class DataUploader extends LightningElement {
         };
 
         console.log(data);
-        console.log(JSON.stringify(data));
 
-        //send POST request to api
-        fetch("api/v1/gameLogs", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => {
-            console.log("Got response: ", response);
-            return response.json();
-        })
-        .then(returnedData => {
-            console.log("Successfully uploaded: ", returnedData);
-        })
-        .catch((error) => {
-            console.log("Error uploading data: ", error);
-        });
+        if(this.validateInput(data)) {
+
+            //send POST request to api
+            fetch("api/v1/gameLogs", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                console.log("Got response: ", response);
+                return response.json();
+            })
+            .then(returnedData => {
+                console.log("Successfully uploaded: ", returnedData);
+            })
+            .catch((error) => {
+                console.log("Error uploading data: ", error);
+            });
+
+        }
+        else {
+
+            this.template.querySelector("p[name=\"errorMessage\"]").hidden = false; //show error message
+
+        }
 
     }
 
@@ -57,6 +65,66 @@ export default class DataUploader extends LightningElement {
     getValueFromInput(name) {
         console.log("Getting data from input field with name " + name);
         return this.template.querySelector("input[name=\"" + name + "\"]").value
+    }
+
+    /**
+     * Validates the input from the form.
+     * Parameters:
+     *  input: The object containing the input data.
+     * Returns:
+     *  True if the data is good to be sent to the database, false otherwise.
+     */
+    validateInput(input) {
+
+        //check game id
+        if(!input["gameId"]) {
+
+            this.template.querySelector("p[name=\"errorMessage\"]").textContent = "Game ID cannot be blank.";
+
+            return false;
+
+        }
+
+        //check each player/victory point pair
+        for(let x = 0; x < input["playerData"].length; x++) {
+
+            //check entries are full
+            if((input["playerData"][x]["playerName"] && !input["playerData"][x]["victoryPoints"]) || 
+                (!input["playerData"][x]["playerName"] && input["playerData"][x]["victoryPoints"])) {
+
+                this.template.querySelector("p[name=\"errorMessage\"]").textContent = 
+                    "Non-blank entries must have a player name and a victory point count.";
+
+                return false;
+
+            }
+
+            //check first entry is not empty
+            if(x == 0 && !input["playerData"][x]["playerName"] && !input["playerData"][x]["victoryPoints"]) {
+
+                this.template.querySelector("p[name=\"errorMessage\"]").textContent = 
+                    "First entry cannot be blank.";
+
+                return false;
+
+            }
+
+            //check no entries out of order
+            if(x > 0 && 
+                (input["playerData"][x]["playerName"] && input["playerData"][x]["victoryPoints"]) && 
+                (!input["playerData"][x-1]["playerName"] && !input["playerData"][x-1]["victoryPoints"])) {
+
+                this.template.querySelector("p[name=\"errorMessage\"]").textContent = 
+                    "Please leave no blank rows before entries.";
+
+                return false;
+
+            }
+
+        }
+
+        return true;
+
     }
 
 }
