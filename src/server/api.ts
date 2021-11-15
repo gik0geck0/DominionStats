@@ -43,26 +43,23 @@ app.get('/api/v1/gameResults', async (req: any, res: any) => {
     res.json(await testQueryAll2());
 });
 
-// app.get('/api/v1/dataUpload', async (req: any, res: any) => {
-//     res.json(await testQueryAll3());
-// });
-
 app.get('/api/v1/gameResultsTest', async (req: any, res: any) => {
     res.json(await testQueryAll4());
 });
 
 app.post('/api/v1/gameResultsTest', (req, res) => {
+    //to test if data is being uploaded correctly
     console.log('Got body:', req.body);
+    console.log('Got method:', req.method);
+    console.log('Got headers:', req.headers);
+
+    //to test getting response from post request
+    // console.log('Got response:', res);
+    // res.sendStatus(200);
     
-    
-    
+    //will be tested once data shows up in body of request (curently does not show up)
     // res.json(testQueryAll3(req));
 });
-
-// app.post('/post-test', (req, res) => {
-//     console.log('Got body:', req.body);
-//     res.sendStatus(200);
-// });
 
 // Serve LWC content
 app.use(express.static(DIST_DIR));

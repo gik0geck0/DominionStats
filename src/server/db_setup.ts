@@ -78,37 +78,7 @@ async function init(): Promise<void> {
         });
         stream.pipe(csvStream);
     }
-
-    /////For data upload//////
-
-    // const text = 'INSERT INTO data_upload(game_label, player_num, player_name, victory_points) VALUES ($1, $2, $3, $4)';
-    // const values = ['20200911a', 2, 'Troy', 38];
-    // // callback
-    // client.query(text, values, (err, res) => {
-    //     if (err) {
-    //         console.log(err.stack)
-    //     } else {
-    //         console.log(res.rows[0]) // values
-    //     }
-    // })
-    // promise
-    // client
-    //     .query(text, values)
-    //     .then(res => {
-    //         console.log(res.rows[0])
-    //         // values
-    //     })
-    //     .catch(e => console.error(e.stack))
-    // // async/await
-    // try {
-    //     const res = await client.query(text, values)
-    //     console.log(res.rows[0])
-    //     // values
-    //     } catch (err) {
-    //         console.log("Failed to upload data", err);
-    //         throw err;
-    //     }
-    }
+}
 
 // Verify connection and run migrations on startup
 init().catch((e) => {
@@ -148,33 +118,25 @@ export async function testQueryAll2(): Promise<GameResults[]> {
     return res.rows as GameResults[];
 }
 
+//to test data upload
+export async function testQueryAll3(req: any): Promise<DataUpload[]> {
+    const query = "INSERT INTO data_upload (player_name, victory_points) VALUES ($3, $4)";
+    const Game_Results = req.body;
 
-// export async function testQueryAll3(req: any): Promise<DataUpload[]> {
-//     const query = "INSERT INTO data_upload (player_name, victory_points) VALUES ($3, $4)";
-//     const Game_Results = req.body;
+    Game_Results.forEach((result: any) => {
+        pool.query(query, result, (error) => {
+        if (error) {
+            console.log(error.stack);
+        }
+        });
+    });
 
-//     Game_Results.forEach((result: any) => {
-//         pool.query(query, result, (error) => {
-//         if (error) {
-//             console.log(error.stack);
-//         }
-//         });
-//     });
+    const res = await pool.query("SELECT id, game_label, player_num, player_name, victory_points FROM data_upload");
 
-//     const res = await pool.query("SELECT id, game_label, player_num, player_name, victory_points FROM data_upload");
+    return res.rows as DataUpload[];
+}
 
-//     // const res = await pool.query("SELECT id, game_label, player_num, player_name, victory_points FROM game_results");
-
-    
-
-//     // const res = await pool.query("SELECT id, game_label, player_num, player_name, victory_points FROM data_upload");
-//     return res.rows;
-// }
-
-//figure out how to insert data into table from upload data form
-//and then reload page for it to show up
-//and then work on charts
-
+//to test that data has been uploaded
 export async function testQueryAll4(): Promise<DataUpload[]> {
     const res = await pool.query("SELECT id, game_label, player_num, player_name, victory_points FROM data_upload");
     return res.rows as DataUpload[];
