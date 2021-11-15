@@ -62,7 +62,6 @@ app.post('/api/v1/gameResultsTest', (req, res) => {
     // console.log('Got response:', res);
     // res.sendStatus(200);
     
-    //will be tested once data shows up in body of request (curently does not show up)
     res.json(testQueryAll3(req.body, res));
 });
 
