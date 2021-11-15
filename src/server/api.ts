@@ -4,18 +4,17 @@ import helmet from 'helmet';
 import express from 'express';
 import path from 'path';
 
-const bodyParser = require('body-parser');
-
 //to import queries from DB service
 import { testQueryAll, testQueryAll2} from './db_setup';
-// import { any } from 'sequelize/types/lib/operators';
-// import { testQueryAll3 } from './db_setup';
+import { testQueryAll3 } from './db_setup';
 import { testQueryAll4 } from './db_setup';
 
 const app = express();
 app.use(compression());
 
+const bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 const HOST = process.env.HOST || 'localhost';
 if (HOST !== 'localhost') {
@@ -64,7 +63,7 @@ app.post('/api/v1/gameResultsTest', (req, res) => {
     // res.sendStatus(200);
     
     //will be tested once data shows up in body of request (curently does not show up)
-    // res.json(testQueryAll3(req, res));
+    res.json(testQueryAll3(req.body, res));
 });
 
 // Serve LWC content

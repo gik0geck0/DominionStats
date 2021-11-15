@@ -120,8 +120,9 @@ export async function testQueryAll2(): Promise<GameResults[]> {
 
 //to test data upload
 export async function testQueryAll3(req: any, res: any): Promise<DataUpload[]> {
-    const query = "INSERT INTO data_upload (player_name, victory_points) VALUES ($3, $4)";
-    const Game_Results = req.body;
+    const query = "INSERT INTO data_upload (player_name, victory_points) VALUES ($1, $2)";
+    // const Game_Results = JSON.parse(req);
+    const Game_Results = JSON.parse(req);
 
     Game_Results.forEach((result: any) => {
         pool.query(query, result, (error) => {
@@ -132,7 +133,7 @@ export async function testQueryAll3(req: any, res: any): Promise<DataUpload[]> {
     });
 
     const response = await pool.query("SELECT id, game_label, player_num, player_name, victory_points FROM data_upload");
-    res.sendStatus(res.rows)
+    // res.sendStatus(res.rows)
 
     return response.rows as DataUpload[];
 }
