@@ -119,7 +119,7 @@ export async function testQueryAll2(): Promise<GameResults[]> {
 }
 
 //to test data upload
-export async function testQueryAll3(req: any): Promise<DataUpload[]> {
+export async function testQueryAll3(req: any, res: any): Promise<DataUpload[]> {
     const query = "INSERT INTO data_upload (player_name, victory_points) VALUES ($3, $4)";
     const Game_Results = req.body;
 
@@ -131,9 +131,10 @@ export async function testQueryAll3(req: any): Promise<DataUpload[]> {
         });
     });
 
-    const res = await pool.query("SELECT id, game_label, player_num, player_name, victory_points FROM data_upload");
+    const response = await pool.query("SELECT id, game_label, player_num, player_name, victory_points FROM data_upload");
+    res.sendStatus(res.rows)
 
-    return res.rows as DataUpload[];
+    return response.rows as DataUpload[];
 }
 
 //to test that data has been uploaded
