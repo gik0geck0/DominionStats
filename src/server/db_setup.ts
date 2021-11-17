@@ -38,8 +38,6 @@ async function init(): Promise<void> {
         await client.release();
     }
 
-   
-
     //for importing game logs from csv file
     const stream = fs.createReadStream("/app/db-migrations/GameLogs.csv");
     const csvData: any[] = [];
@@ -100,46 +98,47 @@ interface GameResults {
     victory_points: number;
 }
 
-interface DataUpload {
-    id: number;
-    game_label: string;
-    player_num: number;
-    player_name: string;
-    victory_points: number;
-}
-
 export async function testQueryAll(): Promise<TestObject[]> {
     const res = await pool.query("SELECT id, name, score FROM test_table") 
     return res.rows as TestObject[];
 }
 
-export async function testQueryAll2(): Promise<GameResults[]> {
+export async function getGameResultsFromDb(): Promise<GameResults[]> {
     const res = await pool.query("SELECT id, game_label, player_num, player_name, victory_points FROM game_results");
     return res.rows as GameResults[];
 }
 
 //to test data upload
-export async function testQueryAll3(req: any, res: any): Promise<DataUpload[]> {
-    const query = "INSERT INTO data_upload (player_name, victory_points) VALUES ($1, $2)";
-    // const Game_Results = JSON.parse(req);
-    const Game_Results = JSON.parse(req);
+//when page is refreshed, submitted data shows up at the bottom of raw results table
+export async function testQueryDataUpload(req: any, res: any): Promise<GameResults[]> {
+    const query = "INSERT INTO game_results (game_label, player_name, victory_points) VALUES ($1, $2, $3)";
+    // console.log(req);
+    const GameId = req.gameId;
+    const Game_Results = req.playerData;
 
-    Game_Results.forEach((result: any) => {
-        pool.query(query, result, (error) => {
-        if (error) {
-            console.log(error.stack);
-        }
+    //to verify that an array with 6 or less player's game results is being passed in
+    //and to verify that a game_id of 10 characters or less is passed in because usually 9 characters (e.g. 20200911a)
+    if (Game_Results.length <= 6 && GameId.length <= 10) {
+        Game_Results.forEach((result: any) => {
+
+            //gives access to variables from result
+            const {playerName, victoryPoints} = result; //equivalent to const playerData = result.playerData; and const victoryPoints = result.victoryPoints
+
+            //build list
+            const values = [GameId, playerName, victoryPoints];
+
+            pool.query(query, values, (error) => {
+            if (error) {
+                console.log(error.stack);
+            }
+            });
         });
-    });
+    }
 
-    const response = await pool.query("SELECT id, game_label, player_num, player_name, victory_points FROM data_upload");
-    // res.sendStatus(res.rows)
+    const response = await pool.query("SELECT id, game_label, player_num, player_name, victory_points FROM game_results");
 
-    return response.rows as DataUpload[];
+    // res.sendStatus(200);
+
+    return response.rows as GameResults[];
 }
 
-//to test that data has been uploaded
-export async function testQueryAll4(): Promise<DataUpload[]> {
-    const res = await pool.query("SELECT id, game_label, player_num, player_name, victory_points FROM data_upload");
-    return res.rows as DataUpload[];
-}

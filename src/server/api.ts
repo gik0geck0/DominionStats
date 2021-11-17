@@ -5,9 +5,7 @@ import express from 'express';
 import path from 'path';
 
 //to import queries from DB service
-import { testQueryAll, testQueryAll2} from './db_setup';
-import { testQueryAll3 } from './db_setup';
-import { testQueryAll4 } from './db_setup';
+import { testQueryAll, getGameResultsFromDb, testQueryDataUpload} from './db_setup';
 
 const app = express();
 app.use(compression());
@@ -43,26 +41,17 @@ app.get('/api/v1/testObjects', async (req: any, res: any) => {
     res.json(await testQueryAll());
 });
 
-app.get('/api/v1/gameResults', async (req: any, res: any) => {
-    res.json(await testQueryAll2());
-});
-
-app.get('/api/v1/gameResultsTest', async (req: any, res: any) => {
-    res.json(await testQueryAll4());
-});
-
 app.post('/api/v1/gameResultsTest', (req, res) => {
-    //to test if data is being uploaded correctly
-    console.log('Got body:', req.body);
-    console.log('Got method:', req.method);
-    console.log('Got headers:', req.headers);
-    // console.log(req.json());
-
     //to test getting response from post request
-    // console.log('Got response:', res);
+    //not sure where to put below code to send a status reponse because currently if I put it here or in the testQueryDataUpload I get the error:
+    //UnhandledPromiseRejectionWarning: Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
     // res.sendStatus(200);
     
-    res.json(testQueryAll3(req.body, res));
+    res.json(testQueryDataUpload(req.body, res));
+});
+
+app.get('/api/v1/gameResults', async (req: any, res: any) => {
+    res.json(await getGameResultsFromDb());
 });
 
 // Serve LWC content
