@@ -63,7 +63,6 @@ export default class DataUploader extends LightningElement {
      *  The value currently in the input field. Can be null.
     */
     getValueFromInput(name) {
-        console.log("Getting data from input field with name " + name);
         return this.template.querySelector("input[name=\"" + name + "\"]").value
     }
 
@@ -76,13 +75,13 @@ export default class DataUploader extends LightningElement {
      */
     validateInput(input) {
 
+        let isDataValid = true; //whether the data is valid
+        let errors = []; //list of error messages
+
         //check game id
         if(!input["gameId"]) {
-
-            this.template.querySelector("p[name=\"errorMessage\"]").textContent = "Game ID cannot be blank.";
-
-            return false;
-
+            errors.push("Game ID cannot be blank.");
+            isDataValid = false;
         }
 
         //check each player/victory point pair
@@ -90,40 +89,40 @@ export default class DataUploader extends LightningElement {
 
             //check entries are full
             if((input["playerData"][x]["playerName"] && !input["playerData"][x]["victoryPoints"]) || 
-                (!input["playerData"][x]["playerName"] && input["playerData"][x]["victoryPoints"])) {
+                    (!input["playerData"][x]["playerName"] && input["playerData"][x]["victoryPoints"])) {
 
-                this.template.querySelector("p[name=\"errorMessage\"]").textContent = 
-                    "Non-blank entries must have a player name and a victory point count.";
-
-                return false;
+                errors.push("Non-blank entries must have a player name and a victory point count.");
+                isDataValid = false;
 
             }
 
             //check first entry is not empty
             if(x == 0 && !input["playerData"][x]["playerName"] && !input["playerData"][x]["victoryPoints"]) {
-
-                this.template.querySelector("p[name=\"errorMessage\"]").textContent = 
-                    "First entry cannot be blank.";
-
-                return false;
-
+                errors.push("First entry cannot be blank.");
+                isDataValid = false;
             }
 
             //check no entries out of order
             if(x > 0 && 
-                (input["playerData"][x]["playerName"] && input["playerData"][x]["victoryPoints"]) && 
-                (!input["playerData"][x-1]["playerName"] && !input["playerData"][x-1]["victoryPoints"])) {
+                    (input["playerData"][x]["playerName"] && input["playerData"][x]["victoryPoints"]) && 
+                    (!input["playerData"][x-1]["playerName"] && !input["playerData"][x-1]["victoryPoints"])) {
 
-                this.template.querySelector("p[name=\"errorMessage\"]").textContent = 
-                    "Please leave no blank rows before entries.";
-
-                return false;
+                errors.push("Please leave no blank rows before entries.");
+                isDataValid = false;
 
             }
 
         }
 
-        return true;
+        let errorString = ""; //full error message
+
+        //build error message
+        for(let error in errors)
+            errorString += error + "\n";
+
+        this.template.querySelector("p[name=\"errorMessage\"]").textContent = errorString; //set error text
+
+        return isDataValid;
 
     }
 
