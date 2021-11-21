@@ -23,8 +23,6 @@ export default class DataUploader extends LightningElement {
             "playerData": playerData
         };
 
-        console.log(data);
-
         if(this.validateInput(data)) {
 
             //send POST request to api
@@ -117,7 +115,7 @@ export default class DataUploader extends LightningElement {
         let errorString = ""; //full error message
 
         //build error message
-        for(let error in errors)
+        for(let error of errors)
             errorString += error + "\n";
 
         this.template.querySelector("p[name=\"errorMessage\"]").textContent = errorString; //set error text
