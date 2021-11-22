@@ -1,7 +1,7 @@
 // Copyright 2021 Observable, Inc.
 // Released under the ISC license.
 // https://observablehq.com/@d3/bar-chart
-function BarChart(data, {
+export function BarChart(data, {
     x = (d, i) => i, // given d in data, returns the (ordinal) x-value
     y = d => d, // given d in data, returns the (quantitative) y-value
     title, // given d in data, returns the title text
