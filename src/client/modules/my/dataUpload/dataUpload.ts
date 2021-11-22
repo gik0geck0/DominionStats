@@ -5,7 +5,7 @@ export default class DataUploader extends LightningElement {
     /**
      * Retrieves the data from the input fields and makes a query to upload it to the database api.
      */
-    gatherDataAndSend() {
+    gatherDataAndSend(): void {
 
         let playerData = []; //data for each player input
 
@@ -60,7 +60,7 @@ export default class DataUploader extends LightningElement {
      * Returns:
      *  The value currently in the input field. Can be null.
     */
-    getValueFromInput(name) {
+    getValueFromInput(name: string): any {
         return this.template.querySelector("input[name=\"" + name + "\"]").value
     }
 
@@ -71,7 +71,7 @@ export default class DataUploader extends LightningElement {
      * Returns:
      *  True if the data is good to be sent to the database, false otherwise.
      */
-    validateInput(input) {
+    validateInput(input: object) : boolean {
 
         let isDataValid = true; //whether the data is valid
         let errors = []; //list of error messages
