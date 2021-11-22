@@ -1,5 +1,5 @@
 import { LightningElement } from 'lwc';
-import { extractPlayerStats, getRawResults, extractFivePlayerStats } from 'my/resultsFetcher';
+import { getRawResults, extractaGameSizePlayerStats } from 'my/resultsFetcher';
 import type { GameResultsData, PlayerStatsAllGames } from 'my/resultsFetcher';
 
 // allows type-completion of the global-variable D3, which is assumed to already have been loaded (from script tag)
@@ -26,7 +26,7 @@ export default class SummaryGraphs extends LightningElement {
         if (!this.hasRendered) {
             this.hasRendered = true;
             const rawResults: GameResultsData[] = await getRawResults();
-            const playerOverviewStats: PlayerStatsAllGames[] = extractFivePlayerStats(rawResults);
+            const playerOverviewStats: PlayerStatsAllGames[] = extractaGameSizePlayerStats(rawResults,5);
 
             // Most Frequent First Place
             this.firstPlaceFreqDonutData = playerOverviewStats

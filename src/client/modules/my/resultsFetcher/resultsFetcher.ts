@@ -44,66 +44,22 @@ export function getRawResults(): Promise<GameResultsData[]> {
     return new Promise((resolve) => resolve(cachedData));
 }
 
-
 export function extractAllPlayerStats(resultsData: GameResultsData[]): PlayerStatsAllGames[] {
     let PlayerStats: PlayerStatsAllGames[] = [];
     calculatePlayerStats(PlayerStats,resultsData);
    return PlayerStats;
 }
 
-export function extractTwoPlayerStats (resultsData: GameResultsData[]) {
+export function extractaGameSizePlayerStats (resultsData: GameResultsData[],num_of_players: number) {
     let PlayerStats: PlayerStatsAllGames[] = [];
     let gameSize: PlayersPerGame[] = [];
     let rawDataFiltered: GameResultsData[] = [];
     gameSize = getGameSizes(resultsData);
-    let filteredGameSize = this.gameSize.filter(game => game.player_num === 2);
+    let filteredGameSize = this.gameSize.filter(game => game.player_num === num_of_players);
     rawDataFiltered = resultsData.filter(({game_label: id1}) => filteredGameSize.some(({game_label: id2}) => id1 === id2));
     calculatePlayerStats(PlayerStats, rawDataFiltered);
     return PlayerStats;
 }
-
-export function extractThreePlayerStats(resultsData: GameResultsData[]) : PlayerStatsAllGames[] {
-    let PlayerStats: PlayerStatsAllGames[] = [];
-    let gameSize: PlayersPerGame[] = [];
-    let rawDataFiltered: GameResultsData[] = [];
-    gameSize = getGameSizes(resultsData);
-    let filteredGameSize = this.gameSize.filter(game => game.player_num === 3);
-    rawDataFiltered = resultsData.filter(({game_label: id1}) => filteredGameSize.some(({game_label: id2}) => id1 === id2));
-    calculatePlayerStats(PlayerStats, rawDataFiltered);
-    return PlayerStats;
-}
-
-export function extractFourPlayerStats(resultsData: GameResultsData[]) : PlayerStatsAllGames[] {
-    let PlayerStats: PlayerStatsAllGames[] = [];
-    let gameSize: PlayersPerGame[] = [];
-    let rawDataFiltered: GameResultsData[] = [];
-    gameSize = getGameSizes(resultsData);
-    let filteredGameSize = this.gameSize.filter(game => game.player_num === 4);
-    rawDataFiltered = resultsData.filter(({game_label: id1}) => filteredGameSize.some(({game_label: id2}) => id1 === id2));
-    calculatePlayerStats(PlayerStats, rawDataFiltered);
-    return PlayerStats;
-}
-export function extractFivePlayerStats(resultsData: GameResultsData[]) : PlayerStatsAllGames[] {
-    let PlayerStats: PlayerStatsAllGames[] = [];
-    let gameSize: PlayersPerGame[] = [];
-    let rawDataFiltered: GameResultsData[] = [];
-    gameSize = getGameSizes(resultsData);
-    let filteredGameSize = this.gameSize.filter(game => game.player_num === 5);
-    rawDataFiltered = resultsData.filter(({game_label: id1}) => filteredGameSize.some(({game_label: id2}) => id1 === id2));
-    calculatePlayerStats(PlayerStats, rawDataFiltered);
-    return PlayerStats;
-}
-export function extractSixPlayerStats(resultsData: GameResultsData[]) : PlayerStatsAllGames[] {
-    let PlayerStats: PlayerStatsAllGames[] = [];
-    let gameSize: PlayersPerGame[] = [];
-    let rawDataFiltered: GameResultsData[] = [];
-    gameSize = getGameSizes(resultsData);
-    let filteredGameSize = this.gameSize.filter(game => game.player_num === 6);
-    rawDataFiltered = resultsData.filter(({game_label: id1}) => filteredGameSize.some(({game_label: id2}) => id1 === id2));
-    calculatePlayerStats(PlayerStats, rawDataFiltered);
-    return PlayerStats;
-}
-
 
 function getGameSizes(resultsData: GameResultsData[]) : PlayersPerGame[] {
     let gameSize: PlayersPerGame[] = [];
