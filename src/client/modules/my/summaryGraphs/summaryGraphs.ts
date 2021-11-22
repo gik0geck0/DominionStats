@@ -34,20 +34,16 @@ export default class SummaryGraphs extends LightningElement {
             const rawResults: GameResultsData[] = await getRawResults();
             const playerOverviewStats: PlayerStatsAllGames[] = extractPlayerStats(rawResults);
 
-            // playerOverviewStats.forEach(async function(stat) {
-            //     let str = JSON.stringify(stat);
-            //     console.log(str);
-            //     })
-
             // Most Frequent First Place
             this.firstPlaceFreqDonutData = playerOverviewStats
                 .filter(ps => ps.first_place > 0)
                 .map((ps) => { return {name: ps.player_name, value: ps.first_place}; })
+                // sort descending
                 .sort((a, b) => {
                     if (a.value < b.value) {
-                        return -1;
-                    } else if (a.value > b.value) {
                         return 1;
+                    } else if (a.value > b.value) {
+                        return -1;
                     }
                     return 0;
                 });
@@ -64,20 +60,17 @@ export default class SummaryGraphs extends LightningElement {
             }, {});
             this.gameParticipationTrendData = Object.entries(playersPerGame).map(([key, value]) => { return {game_label: key, player_num: value}});
 
-            //Total Points Won
-            // this.totalPointsWonBarData = Object.entries(playerOverviewStats).map(([key, value]) => {return {player_name: key, total_victory_points: value}});
-
-            // this.totalPointsWonBarData = playerOverviewStats
-            //     .filter(bs => bs.total_victory_points > 0)
-            //     .map((bs) => {return {name: bs.player_name, value: bs.total_victory_points}; })
-            //     .sort((a,b) => {
-            //         if (a.value < b.value) {
-            //             return -1;
-            //         } else if (a.value > b.value) {
-            //             return 1;
-            //         }
-            //         return 0;
-            //     });
+            // Total Points
+            this.totalPointsWonBarData = playerOverviewStats
+                // sort descending
+                .sort((a,b) => {
+                    if (a.total_victory_points < b.total_victory_points) {
+                        return 1;
+                    } else if (a.total_victory_points > b.total_victory_points) {
+                        return -1;
+                    }
+                    return 0;
+                });
 
         } else {
             console.log("Blocked a re-render propagation");

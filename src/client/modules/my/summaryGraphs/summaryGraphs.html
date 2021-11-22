@@ -26,27 +26,20 @@
             </my-connected-scatter-graph>
         </div>
 
-        <!-- <div class="slds-float_left slds-m-horizontal_medium slds-m-vertical_small">
-            <my-connected-bar-chart
-                data={totalPointsWonBarData}
-                title="Total Points Won"
-                >
-            </my-connected-bar-chart>
-        </div> -->
-
-        <!-- <div class="slds-float_left slds-m-horizontal_medium slds-m-vertical_small">
-            <my-connected-bar-chart
+        <div class="slds-float_left slds-m-horizontal_medium slds-m-vertical_small">
+            <my-bar-graph
                 data={totalPointsWonBarData}
                 title="Total Points Won"
                 xkey="player_name"
-                xlabel="Players"
+                xlabel="Player"
+                xtype={scalePoint}
                 ylabel="Points"
                 ykey="total_victory_points"
-                width=600
+                width=800
                 height=300
                 >
-            </my-connected-bar-chart>
-        </div> -->
+            </my-bar-graph>
+        </div>
 
     </div>
 </template>
