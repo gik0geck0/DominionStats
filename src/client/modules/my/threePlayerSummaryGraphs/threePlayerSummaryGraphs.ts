@@ -1,5 +1,5 @@
 import { LightningElement } from 'lwc';
-import { extractAllPlayerStats, getRawResults } from 'my/resultsFetcher';
+import {getRawResults,extractaGameSizePlayerStats } from 'my/resultsFetcher';
 import type { GameResultsData, PlayerStatsAllGames } from 'my/resultsFetcher';
 
 // allows type-completion of the global-variable D3, which is assumed to already have been loaded (from script tag)
@@ -15,15 +15,9 @@ interface DonutData {
     value: number;
 }
 
-interface PointsData {
-    player_name: string;
-    total_victory_points: number;
-}
-
 export default class SummaryGraphs extends LightningElement {
-    gameParticipationTrendData: PlayersPerGame[] = [];
+    //gameParticipationTrendData: PlayersPerGame[] = [];
     firstPlaceFreqDonutData: DonutData[] = [];
-    totalPointsWonBarData: PointsData[] = [];
     hasRendered = false;
     scalePoint = d3.scalePoint;
 
@@ -32,46 +26,20 @@ export default class SummaryGraphs extends LightningElement {
         if (!this.hasRendered) {
             this.hasRendered = true;
             const rawResults: GameResultsData[] = await getRawResults();
-            const playerOverviewStats: PlayerStatsAllGames[] = extractAllPlayerStats(rawResults);
+            const playerOverviewStats: PlayerStatsAllGames[] = extractaGameSizePlayerStats(rawResults,3);
 
             // Most Frequent First Place
             this.firstPlaceFreqDonutData = playerOverviewStats
                 .filter(ps => ps.first_place > 0)
                 .map((ps) => { return {name: ps.player_name, value: ps.first_place}; })
-                // sort descending
                 .sort((a, b) => {
                     if (a.value < b.value) {
-                        return 1;
+                        return -1;
                     } else if (a.value > b.value) {
-                        return -1;
-                    }
-                    return 0;
-                });
-
-            // Game participation
-            const playersPerGame = rawResults.reduce((accum, gd: GameResultsData) => {
-                const {game_label} = gd;
-                if (!accum[game_label]) {
-                    accum[game_label] = 1;
-                } else {
-                    accum[game_label]++;
-                }
-                return accum;
-            }, {});
-            this.gameParticipationTrendData = Object.entries(playersPerGame).map(([key, value]) => { return {game_label: key, player_num: value}});
-
-            // Total Points
-            this.totalPointsWonBarData = playerOverviewStats
-                // sort descending
-                .sort((a,b) => {
-                    if (a.total_victory_points < b.total_victory_points) {
                         return 1;
-                    } else if (a.total_victory_points > b.total_victory_points) {
-                        return -1;
                     }
                     return 0;
                 });
-
         } else {
             console.log("Blocked a re-render propagation");
         }
