@@ -37,17 +37,19 @@ app.get('/api/v1/endpoint', (req: any, res: any) => {
     res.json({ success: true });
 });
 
-app.get('/api/v1/testObjects', async (req: any, res: any) => {
-    res.json(await testQueryAll());
-});
+if (!process.env.NODB) {
+    app.get('/api/v1/testObjects', async (req: any, res: any) => {
+        res.json(await testQueryAll());
+    });
 
-app.post('/api/v1/gameResultsTest', (req: any, res: any) => {
-    res.json(testQueryDataUpload(req.body, res));
-});
+    app.post('/api/v1/gameResultsTest', (req: any, res: any) => {
+        res.json(testQueryDataUpload(req.body, res));
+    });
 
-app.get('/api/v1/gameResults', async (req: any, res: any) => {
-    res.json(await getGameResultsFromDb());
-});
+    app.get('/api/v1/gameResults', async (req: any, res: any) => {
+        res.json(await getGameResultsFromDb());
+    });
+}
 
 // Serve LWC content
 app.use(express.static(DIST_DIR));

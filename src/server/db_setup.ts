@@ -76,11 +76,13 @@ async function init(): Promise<void> {
     }
 }
 
-// Verify connection and run migrations on startup
-init().catch((e) => {
-    console.error("Failed to init db_setup: ", e);
-    process.exit(1);
-});
+if (!process.env.NODB) {
+    // Verify connection and run migrations on startup
+    init().catch((e) => {
+        console.error("Failed to init db_setup: ", e);
+        process.exit(1);
+    });
+}
 
 interface TestObject {
     id: number;
