@@ -127,18 +127,22 @@ export async function testQueryDataUpload(req: any, res: any): Promise<GameResul
             //build list
             const values = [GameId, playerName, victoryPoints];
 
-            pool.query(query, values, (error) => {
+            pool.query(query, values, (error: any) => {
             if (error) {
                 console.log(error.stack);
+                // res.sendStatus(500);
+                return;
             }
+            // else {
+            //     res.status(200).json({
+            //         status: 'success',
+            //         data: req.body,
+            //     })
+            // }
             });
         });
     }
 
-    const response = await pool.query("SELECT id, game_label, player_num, player_name, victory_points FROM game_results");
-
-    // res.sendStatus(200);
-
-    return response.rows as GameResults[];
+    return getGameResultsFromDb();
 }
 

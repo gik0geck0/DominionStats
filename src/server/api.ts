@@ -41,12 +41,7 @@ app.get('/api/v1/testObjects', async (req: any, res: any) => {
     res.json(await testQueryAll());
 });
 
-app.post('/api/v1/gameResultsTest', (req, res) => {
-    //to test getting response from post request
-    //not sure where to put below code to send a status reponse because currently if I put it here or in the testQueryDataUpload I get the error:
-    //UnhandledPromiseRejectionWarning: Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client
-    // res.sendStatus(200);
-    
+app.post('/api/v1/gameResultsTest', (req: any, res: any) => {
     res.json(testQueryDataUpload(req.body, res));
 });
 
