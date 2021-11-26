@@ -152,14 +152,14 @@ export async function testQueryDataUpload(req: any, res: any): Promise<GameResul
             //"Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client" is still happening and not sure why
             //However, the correct 400 status and error message shows up in the browser console for the below if statements
             //server validation
-            if (playerName == null || playerName == "") {
+            if (playerName === null || playerName === "") {
                 // console.log("Invalid Player Name");
                 return res.status(400).json({
                     status: 'error',
                     error: 'Invalid Player Name',
                 });
             } 
-            if (victoryPoints == null || !Number.isInteger(victoryPoints)) {
+            if (victoryPoints === null || !Number.isInteger(victoryPoints)) {
                 // console.log("Invalid Victory Points");
                 return res.status(400).json({
                     status: 'error',
@@ -202,6 +202,8 @@ export async function testQueryDataUpload(req: any, res: any): Promise<GameResul
         });
     }
 
-    return getGameResultsFromDb();
+    const response = getGameResultsFromDb();
+
+    return response;
 }
 
