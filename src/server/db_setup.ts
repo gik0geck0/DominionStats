@@ -108,7 +108,7 @@ export async function getGameResultsFromDb(): Promise<GameResults[]> {
 
 //to test data upload
 //when page is refreshed, submitted data shows up in raw results table
-export async function testQueryDataUpload(req: any, res: any): Promise<GameResults[]> {
+export function testQueryDataUpload(req: any, res: any): Promise<GameResults[]> {
     const query = "INSERT INTO game_results (game_label, player_num, player_name, victory_points) VALUES ($1, $2, $3, $4)";
     // console.log(req);
     const GameId = req.gameId;
@@ -202,8 +202,6 @@ export async function testQueryDataUpload(req: any, res: any): Promise<GameResul
         });
     }
 
-    const response = getGameResultsFromDb();
-
-    return response;
+    return getGameResultsFromDb();
 }
 
