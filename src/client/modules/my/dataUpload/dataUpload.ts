@@ -137,6 +137,42 @@ export default class DataUploader extends LightningElement {
 
         }
 
+        //check >1 entry
+
+        let numNonBlankEntries = 0; //total non blank entries
+
+        //find all valid entries
+        for(let row of input["playerData"])
+            if(row["playerName"]!== "" && !Object.is(row["victoryPoints"], NaN))
+                numNonBlankEntries++;
+
+        if(numNonBlankEntries <= 1)
+            errors.push("Input must have at least two entries.");
+
+        //check descending victory points
+
+        let lastScore = Number.POSITIVE_INFINITY; //last visited score
+
+        //validate points
+        for(let x = 0; x < input["playerData"].length; x++) {
+
+            //only check non blank entries
+            if(!Object.is(input["playerData"][x]["victoryPoints"], NaN)) {
+
+                //make sure score is less than previous score
+                if(input["playerData"][x]["victoryPoints"] > lastScore) {
+
+                    errors.push("Please order entries in decreasing victory point order.");
+                    break;
+
+                }
+
+                lastScore = input["playerData"][x]["victoryPoints"];
+
+            }
+
+        }
+
         return errors;
 
     }
