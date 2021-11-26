@@ -44,7 +44,7 @@ export default class DataUploader extends LightningElement {
             console.log("Sending data: ", data);
 
             //send POST request to api
-            fetch("api/v1/gameLogs", {
+            fetch("api/v1/gameResultsTest", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -52,14 +52,19 @@ export default class DataUploader extends LightningElement {
                 body: JSON.stringify(data)
             })
             .then(response => {
-                console.log("Got response: ", response);
-                return response.json();
-            })
-            .then(returnedData => {
-                console.log("Successfully uploaded: ", returnedData);
-            })
-            .catch((error) => {
-                console.log("Error uploading data: ", error);
+                
+                //check response from server
+                if(response.status == 200)
+                    location.reload(); //refresh page
+
+                else if(response.status >= 400) {
+
+                    this.template.querySelector("p[name=\"errorMessage\"]").textContent = 
+                            "Something went wrong with the data upload. Please try again.";
+                    this.template.querySelector("p[name=\"errorMessage\"]").hidden = false;
+
+                }
+
             });
 
         }
