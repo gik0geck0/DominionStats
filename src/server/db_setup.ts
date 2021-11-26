@@ -107,36 +107,97 @@ export async function getGameResultsFromDb(): Promise<GameResults[]> {
 }
 
 //to test data upload
-//when page is refreshed, submitted data shows up at the bottom of raw results table
+//when page is refreshed, submitted data shows up in raw results table
 export async function testQueryDataUpload(req: any, res: any): Promise<GameResults[]> {
-    const query = "INSERT INTO game_results (game_label, player_name, victory_points) VALUES ($1, $2, $3)";
+    const query = "INSERT INTO game_results (game_label, player_num, player_name, victory_points) VALUES ($1, $2, $3, $4)";
     // console.log(req);
     const GameId = req.gameId;
     const Game_Results = req.playerData;
 
-    //to verify that an array with 6 or less player's game results is being passed in
-    //and to verify that a game_id of 10 characters or less is passed in because usually 9 characters (e.g. 20200911a)
-    if (Game_Results.length <= 6 && GameId.length <= 10) {
-        Game_Results.forEach((result: any) => {
+    let PlayerNum = 0; //used to insert player's rank into table in DESC order
+    let invalidChars = /[!@#$%^&*()+\=\[\]{};':"\\|,.<>\/?]+/; //used to make sure none of these chars are used in players' names
 
+    //to verify that an array with less than 6 but greater than 2 players' game results is being passed in
+    if (Game_Results.length < 2) {
+        console.log("Too few players");
+        return res.status(400).json({
+            status: 'error',
+            error: 'Must enter a minimum of 2 players',
+        });
+    }
+    else if (Game_Results.length > 6) {
+        console.log("More than 6 players entered / this shouldn't be possible given there are only 6 places to input names");
+        return res.status(400).json({
+            status: 'error',
+            error: "More than 6 players entered / this shouldn't be possible given there are only 6 places to input names",
+        });
+    }
+
+    //used for ordering players' ranking in DESC order
+    const playerPoints = new Map();
+    Game_Results.forEach((player : any)=> {
+        const {playerName, victoryPoints} = player;
+        playerPoints.set(playerName, victoryPoints);
+    });
+
+    const playerPointsSorted = new Map([...playerPoints.entries()].sort((a, b) => b[1] - a[1]));
+    // console.log(playerPointsSorted);
+
+    //verify that a game_id of less than 10 characters is passed in because usually 8 or 9 characters (e.g. 20200911 - YYYYMMDD or 20200911a - YYYYMMDDa)
+    if (Game_Results.length >= 2 && Game_Results.length <= 6 && GameId.length < 10) {
+        Game_Results.forEach((result: any) => {
             //gives access to variables from result
             const {playerName, victoryPoints} = result; //equivalent to const playerData = result.playerData; and const victoryPoints = result.victoryPoints
 
+            //"Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client" is still happening and not sure why
+            //However, the correct 400 status and error message shows up in the browser console for the below if statements
+            //server validation
+            if (playerName == null || playerName == "") {
+                // console.log("Invalid Player Name");
+                return res.status(400).json({
+                    status: 'error',
+                    error: 'Invalid Player Name',
+                });
+            } 
+            if (victoryPoints == null || !Number.isInteger(victoryPoints)) {
+                // console.log("Invalid Victory Points");
+                return res.status(400).json({
+                    status: 'error',
+                    error: 'Invalid Victory Points',
+                });
+            }
+            if (invalidChars.test(playerName)){ //check to see if there are any invalid characters in the string (see above for invalid chars)
+                // console.log("Invalid characters");
+                return res.status(400).json({
+                    status: 'error',
+                    error: 'Invalid characters',
+                });
+            }
+
+            let index = 0;
+            //if the player's name and the points match, use that index for the player's ranking in the game (need both to handle ranking ties)
+            //if the top two players have the same score, should the ranking be the same (e.g. tie for 1st place) or should it give one person 1st and the other person 2nd?
+            //curently it would give one player 1st place and the player that tied them 2nd place, even though their scores are the same
+            playerPointsSorted.forEach(function(value, key) {
+                // console.log("Values", key + ' = ' + value)
+                index++;
+                if (playerName == key && victoryPoints == value) {
+                    // console.log("index", index);
+                    PlayerNum = index;
+                }
+            });
+
             //build list
-            const values = [GameId, playerName, victoryPoints];
+            const values = [GameId, PlayerNum, playerName, victoryPoints];
 
             pool.query(query, values, (error: any) => {
             if (error) {
                 console.log(error.stack);
-                // res.sendStatus(500);
-                return;
+                return res.status(500).json({
+                    status: 'error',
+                    error: 'Failed to insert data',
+                });
             }
-            // else {
-            //     res.status(200).json({
-            //         status: 'success',
-            //         data: req.body,
-            //     })
-            // }
             });
         });
     }
