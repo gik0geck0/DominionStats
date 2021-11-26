@@ -26,7 +26,22 @@ export default class DataUploader extends LightningElement {
         let errorMessages = this.validateInput(data) //validate input data
 
         //if no errors were found
-        if(!(errorMessages)) {
+        if(errorMessages.length == 0) {
+
+            let newPlayerData = [] //player data without blank entries
+            
+            //remove blank input entries
+            for(let playerEntry of data.playerData) {
+                if(playerEntry.playerName!== "" && !Object.is(playerEntry.victoryPoints, NaN)) {
+                    newPlayerData.push({
+                        "playerName": playerEntry.playerName, "victoryPoints": playerEntry.victoryPoints
+                    });
+                }
+            }
+
+            data.playerData = newPlayerData; //reassign data
+
+            console.log("Sending data: ", data);
 
             //send POST request to api
             fetch("api/v1/gameLogs", {
