@@ -23,7 +23,10 @@ export default class DataUploader extends LightningElement {
             "playerData": playerData
         };
 
-        if(this.validateInput(data)) {
+        let errorMessages = this.validateInput(data) //validate input data
+
+        //if no errors were found
+        if(!(errorMessages)) {
 
             //send POST request to api
             fetch("api/v1/gameLogs", {
@@ -47,6 +50,13 @@ export default class DataUploader extends LightningElement {
         }
         else {
 
+            let errorString = ""; //full error message
+
+            //build error message
+            for(let error of errorMessages)
+                errorString += error + "\n";
+    
+            this.template.querySelector("p[name=\"errorMessage\"]").textContent = errorString; //set error text
             this.template.querySelector("p[name=\"errorMessage\"]").hidden = false; //show error message
 
         }
@@ -69,9 +79,9 @@ export default class DataUploader extends LightningElement {
      * Parameters:
      *  input: The object containing the input data.
      * Returns:
-     *  True if the data is good to be sent to the database, false otherwise.
+     *  A list of error messages that were found during validation. If the data is valid, the list will be empty.
      */
-    validateInput(input: object) : boolean {
+    validateInput(input: object) : string[] {
 
         let isDataValid = true; //whether the data is valid
         let errors = []; //list of error messages
@@ -112,15 +122,7 @@ export default class DataUploader extends LightningElement {
 
         }
 
-        let errorString = ""; //full error message
-
-        //build error message
-        for(let error of errors)
-            errorString += error + "\n";
-
-        this.template.querySelector("p[name=\"errorMessage\"]").textContent = errorString; //set error text
-
-        return isDataValid;
+        return errors;
 
     }
 
