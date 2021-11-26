@@ -120,14 +120,14 @@ export function testQueryDataUpload(req: any, res: any): Promise<GameResults[]> 
     //to verify that an array with less than 6 but greater than 2 players' game results is being passed in
     if (Game_Results.length < 2) {
         console.log("Too few players");
-        return res.status(400).json({
+        res.status(400).json({
             status: 'error',
             error: 'Must enter a minimum of 2 players',
         });
     }
     else if (Game_Results.length > 6) {
         // console.log("More than 6 players entered / this shouldn't be possible given there are only 6 places to input names");
-        return res.status(400).json({
+        res.status(400).json({
             status: 'error',
             error: "More than 6 players entered / this shouldn't be possible given there are only 6 places to input names",
         });
@@ -154,21 +154,21 @@ export function testQueryDataUpload(req: any, res: any): Promise<GameResults[]> 
             //server validation
             if (playerName === null || playerName === "") {
                 // console.log("Invalid Player Name");
-                return res.status(400).json({
+                res.status(400).json({
                     status: 'error',
                     error: 'Invalid Player Name',
                 });
             } 
             if (victoryPoints === null || !Number.isInteger(victoryPoints)) {
                 // console.log("Invalid Victory Points");
-                return res.status(400).json({
+                res.status(400).json({
                     status: 'error',
                     error: 'Invalid Victory Points',
                 });
             }
             if (invalidChars.test(playerName)){ //check to see if there are any invalid characters in the string (see above for invalid chars)
                 // console.log("Invalid characters");
-                return res.status(400).json({
+                res.status(400).json({
                     status: 'error',
                     error: 'Invalid characters',
                 });
@@ -193,7 +193,7 @@ export function testQueryDataUpload(req: any, res: any): Promise<GameResults[]> 
             pool.query(query, values, (error: any) => {
             if (error) {
                 console.log(error.stack);
-                return res.status(500).json({
+                res.status(500).json({
                     status: 'error',
                     error: 'Failed to insert data',
                 });
