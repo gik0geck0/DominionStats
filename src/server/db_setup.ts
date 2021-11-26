@@ -115,7 +115,7 @@ export async function testQueryDataUpload(req: any, res: any): Promise<GameResul
     const Game_Results = req.playerData;
 
     let PlayerNum = 0; //used to insert player's rank into table in DESC order
-    let invalidChars = /[!@#$%^&*()+\=\[\]{};':"\\|,.<>\/?]+/; //used to make sure none of these chars are used in players' names
+    let invalidChars = /[!@#$%^&*()+=[\]{};':"\\|,.<>/?]+/; //used to make sure none of these chars are used in players' names
 
     //to verify that an array with less than 6 but greater than 2 players' game results is being passed in
     if (Game_Results.length < 2) {
@@ -126,7 +126,7 @@ export async function testQueryDataUpload(req: any, res: any): Promise<GameResul
         });
     }
     else if (Game_Results.length > 6) {
-        console.log("More than 6 players entered / this shouldn't be possible given there are only 6 places to input names");
+        // console.log("More than 6 players entered / this shouldn't be possible given there are only 6 places to input names");
         return res.status(400).json({
             status: 'error',
             error: "More than 6 players entered / this shouldn't be possible given there are only 6 places to input names",
@@ -135,7 +135,7 @@ export async function testQueryDataUpload(req: any, res: any): Promise<GameResul
 
     //used for ordering players' ranking in DESC order
     const playerPoints = new Map();
-    Game_Results.forEach((player : any)=> {
+    Game_Results.forEach((player : any) => {
         const {playerName, victoryPoints} = player;
         playerPoints.set(playerName, victoryPoints);
     });
@@ -181,7 +181,7 @@ export async function testQueryDataUpload(req: any, res: any): Promise<GameResul
             playerPointsSorted.forEach(function(value, key) {
                 // console.log("Values", key + ' = ' + value)
                 index++;
-                if (playerName == key && victoryPoints == value) {
+                if (playerName === key && victoryPoints === value) {
                     // console.log("index", index);
                     PlayerNum = index;
                 }
