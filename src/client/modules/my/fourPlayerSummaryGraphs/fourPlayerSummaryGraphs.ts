@@ -16,8 +16,8 @@ interface DonutData {
 }
 
 export default class SummaryGraphs extends LightningElement {
-    //gameParticipationTrendData: PlayersPerGame[] = [];
     firstPlaceFreqDonutData: DonutData[] = [];
+    gamesPlayedDonuntData: DonutData[] = [];
     hasRendered = false;
     scalePoint = d3.scalePoint;
 
@@ -40,6 +40,18 @@ export default class SummaryGraphs extends LightningElement {
                     }
                     return 0;
                 });
+             // Games Played Most Frequent
+             this.gamesPlayedDonuntData = playerOverviewStats
+                .filter(ps => ps.num_games > 1)
+                .map((ps) => { return {name: ps.player_name, value: ps.num_games}; })
+                .sort((a, b) => {
+                    if (a.value < b.value) {
+                        return -1;
+                    } else if (a.value > b.value) {
+                        return 1;
+                    }
+                    return 0;
+             });
         } else {
             console.log("Blocked a re-render propagation");
         }
