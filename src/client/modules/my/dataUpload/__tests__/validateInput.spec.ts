@@ -82,6 +82,31 @@ describe("Input form field validation", () => {
 
     });
 
+    it("Valid input object with scores <= 0 has no errors", () => {
+
+        const testObject = {
+            "gameId": "id",
+            "playerData": [
+                {
+                    "playerName": "Player 1",
+                    "victoryPoints": 10
+                },
+                {
+                    "playerName": "Player 2",
+                    "victoryPoints": 0
+                },
+                {
+                    "playerName": "Player 3",
+                    "victoryPoints": -10
+                }
+            ]
+        }
+
+        const result = validateInput(testObject);
+        expect(result.length).toEqual(0);
+
+    });
+
     it("Input object with blank game ID is invalid", () => {
 
         const testObject = {
@@ -159,7 +184,7 @@ describe("Input form field validation", () => {
             "gameId": "id",
             "playerData": [
                 {
-                    "playerName": "",
+                    "playerName": "Player 1",
                     "victoryPoints": 10
                 },
                 {

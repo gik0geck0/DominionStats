@@ -20,8 +20,8 @@ export function validateInput(input: object) : string[] {
     for(let x = 0; x < input["playerData"].length; x++) {
 
         //check entries are full
-        if((input["playerData"][x]["playerName"] && !input["playerData"][x]["victoryPoints"]) || 
-                (!input["playerData"][x]["playerName"] && input["playerData"][x]["victoryPoints"])) {
+        if((input["playerData"][x]["playerName"] && Object.is(input["playerData"][x]["victoryPoints"], NaN)) || 
+                (!input["playerData"][x]["playerName"] && !Object.is(input["playerData"][x]["victoryPoints"], NaN))) {
 
             errors.push("Non-blank entries must have a player name and a victory point count.");
             isDataValid = false;
@@ -29,15 +29,15 @@ export function validateInput(input: object) : string[] {
         }
 
         //check first entry is not empty
-        if(x == 0 && !input["playerData"][x]["playerName"] && !input["playerData"][x]["victoryPoints"]) {
+        if(x == 0 && !input["playerData"][x]["playerName"] && Object.is(input["playerData"][x]["victoryPoints"], NaN)) {
             errors.push("First entry cannot be blank.");
             isDataValid = false;
         }
 
         //check no entries out of order
         if(x > 0 && 
-                (input["playerData"][x]["playerName"] && input["playerData"][x]["victoryPoints"]) && 
-                (!input["playerData"][x-1]["playerName"] && !input["playerData"][x-1]["victoryPoints"])) {
+                (input["playerData"][x]["playerName"] && !Object.is(input["playerData"][x]["victoryPoints"], NaN)) && 
+                (!input["playerData"][x-1]["playerName"] && Object.is(input["playerData"][x-1]["victoryPoints"], NaN))) {
 
             errors.push("Please leave no blank rows before entries.");
             isDataValid = false;
