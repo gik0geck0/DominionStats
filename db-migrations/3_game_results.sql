@@ -1,4 +1,4 @@
-ALTER TABLE IF NOT EXISTS game_results (
+ALTER TABLE IF EXISTS game_results (
     id serial PRIMARY KEY,
     game_label VARCHAR(255) NOT NULL,
     ALTER COLUMN player_num set NOT NULL,
