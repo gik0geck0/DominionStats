@@ -110,7 +110,6 @@ export async function getGameResultsFromDb(): Promise<GameResults[]> {
 //when page is refreshed, submitted data shows up in raw results table
 export function testQueryDataUpload(req: any, res: any): Promise<GameResults[]> {
     const query = "INSERT INTO game_results (game_label, player_num, player_name, victory_points) VALUES ($1, $2, $3, $4)";
-    // console.log(req);
     const GameId = req.gameId;
     const Game_Results = req.playerData;
 
@@ -141,7 +140,6 @@ export function testQueryDataUpload(req: any, res: any): Promise<GameResults[]> 
     });
 
     const playerPointsSorted = new Map([...playerPoints.entries()].sort((a, b) => b[1] - a[1]));
-    // console.log(playerPointsSorted);
 
     //verify that a game_id of less than 10 characters is passed in because usually 8 or 9 characters (e.g. 20200911 - YYYYMMDD or 20200911a - YYYYMMDDa)
     if (Game_Results.length >= 2 && Game_Results.length <= 6 && GameId.length < 10) {
@@ -149,25 +147,22 @@ export function testQueryDataUpload(req: any, res: any): Promise<GameResults[]> 
             //gives access to variables from result
             const {playerName, victoryPoints} = result; //equivalent to const playerData = result.playerData; and const victoryPoints = result.victoryPoints
 
-            //"Error [ERR_HTTP_HEADERS_SENT]: Cannot set headers after they are sent to the client" is still happening and not sure why
-            //However, the correct 400 status and error message shows up in the browser console for the below if statements
             //server validation
             if (playerName === null || playerName === "") {
-                // console.log("Invalid Player Name");
                 res.status(400).json({
                     status: 'error',
                     error: 'Invalid Player Name',
                 });
             } 
             if (victoryPoints === null || !Number.isInteger(victoryPoints)) {
-                // console.log("Invalid Victory Points");
                 res.status(400).json({
                     status: 'error',
                     error: 'Invalid Victory Points',
                 });
             }
-            if (invalidChars.test(playerName)){ //check to see if there are any invalid characters in the string (see above for invalid chars)
-                // console.log("Invalid characters");
+
+            //check to see if there are any invalid characters in the string (see above for invalid chars)
+            if (invalidChars.test(playerName)){ 
                 res.status(400).json({
                     status: 'error',
                     error: 'Invalid characters',
@@ -175,14 +170,11 @@ export function testQueryDataUpload(req: any, res: any): Promise<GameResults[]> 
             }
 
             let index = 0;
+
             //if the player's name and the points match, use that index for the player's ranking in the game (need both to handle ranking ties)
-            //if the top two players have the same score, should the ranking be the same (e.g. tie for 1st place) or should it give one person 1st and the other person 2nd?
-            //curently it would give one player 1st place and the player that tied them 2nd place, even though their scores are the same
             playerPointsSorted.forEach(function(value, key) {
-                // console.log("Values", key + ' = ' + value)
                 index++;
                 if (playerName === key && victoryPoints === value) {
-                    // console.log("index", index);
                     PlayerNum = index;
                 }
             });
