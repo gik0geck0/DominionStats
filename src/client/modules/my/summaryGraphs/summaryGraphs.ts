@@ -14,6 +14,10 @@ interface DonutData {
     name: string;
     value: number;
 }
+interface AvgPointsData {
+    player_name: string;
+    avg_points: number;
+}
 
 interface PointsData {
     player_name: string;
@@ -23,7 +27,8 @@ interface PointsData {
 export default class SummaryGraphs extends LightningElement {
     gameParticipationTrendData: PlayersPerGame[] = [];
     firstPlaceFreqDonutData: DonutData[] = [];
-    totalPointsWonBarData: PointsData[] = [];
+    gamesPlayedDonuntData: DonutData[] = [];
+    avgPointsWonBarData: AvgPointsData[] = [];
     hasRendered = false;
     scalePoint = d3.scalePoint;
 
@@ -47,7 +52,28 @@ export default class SummaryGraphs extends LightningElement {
                     }
                     return 0;
                 });
-
+            // Games Played Most Frequent
+            this.gamesPlayedDonuntData = playerOverviewStats
+                .filter(ps => ps.num_games > 1)
+                .map((ps) => { return {name: ps.player_name, value: ps.num_games}; })
+                .sort((a, b) => {
+                    if (a.value < b.value) {
+                        return -1;
+                    } else if (a.value > b.value) {
+                        return 1;
+                    }
+                    return 0;
+                });
+            // Average Points
+            this.avgPointsWonBarData = playerOverviewStats
+                .sort((a,b) => {
+                    if (a.avg_points < b.avg_points) {
+                        return 1;
+                    } else if (a.avg_points > b.avg_points) {
+                        return -1;
+                    }
+                    return 0;
+                });
             // Game participation
             const playersPerGame = rawResults.reduce((accum, gd: GameResultsData) => {
                 const {game_label} = gd;

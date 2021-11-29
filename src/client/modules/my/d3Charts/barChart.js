@@ -24,7 +24,7 @@ export function BarChart(data, {
     // Compute values.
     const X = d3.map(data, x);
     const Y = d3.map(data, y);
-  
+
     // Compute default domains, and unique the x-domain.
     if (xDomain === undefined) xDomain = X;
     if (yDomain === undefined) yDomain = [0, d3.max(Y)];
@@ -38,7 +38,7 @@ export function BarChart(data, {
     const yScale = yType(yDomain, yRange);
     const xAxis = d3.axisBottom(xScale).tickSizeOuter(0);
     const yAxis = d3.axisLeft(yScale).ticks(height / 40, yFormat);
-  
+
     // Compute titles.
     if (title === undefined) {
       const formatValue = yScale.tickFormat(100, yFormat);
@@ -48,13 +48,13 @@ export function BarChart(data, {
       const T = title;
       title = i => T(O[i], i, data);
     }
-  
+
     const svg = d3.create("svg")
         .attr("width", width)
         .attr("height", height)
         .attr("viewBox", [0, 0, width, height])
         .attr("style", "max-width: 100%; height: auto; height: intrinsic;");
-  
+
     svg.append("g")
         .attr("transform", `translate(${marginLeft},0)`)
         .call(yAxis)
@@ -68,7 +68,7 @@ export function BarChart(data, {
             .attr("fill", "currentColor")
             .attr("text-anchor", "start")
             .text(yLabel));
-  
+
     const bar = svg.append("g")
         .attr("fill", color)
       .selectAll("rect")

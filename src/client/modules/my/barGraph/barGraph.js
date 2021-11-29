@@ -67,4 +67,4 @@ export default class ConnectedScatterGraph extends LightningElement {
       // Attach it to the element
       this.template.querySelector(".barchart").replaceChildren(csElement);
     }
-}
+} 
