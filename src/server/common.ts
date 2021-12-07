@@ -35,7 +35,6 @@ export interface ErrorObject {
     error: string;
 }
 
-export type GameResultsFormResult = UserErrorResult | DevErrorResult | SuccessResult;
 export interface UserErrorResult {
     status: 400;
     results: ErrorObject[];
@@ -48,3 +47,4 @@ export interface SuccessResult {
     status: 200;
     results: GameResults[];
 }
+export type GameResultsFormResult = UserErrorResult | DevErrorResult | SuccessResult;

@@ -143,9 +143,9 @@ export async function insertGameResults(req: GameResultsForm): Promise<GameResul
         // Failures to insert are considered developer errors (or infra) aka 500
         console.log("Insert errors: ", insertErrors)
         return {status: 500, results: insertErrors};
-    } else {
-        // TODO: Could return latest DB results here
-        return {status: 200, results: []};
     }
+
+    // TODO: Could return latest DB results here
+    return {status: 200, results: []};
 }
 
