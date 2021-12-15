@@ -177,7 +177,7 @@ function setupRoutes() {
         if (process.env.NODB) {
             return res.status(501).send();
         }
-        res.json(await testQueryAll());
+        return res.json(await testQueryAll());
     });
 
     app.post('/api/v1/gameResults', ensureLoggedIn({throw: true}), async (req, res) => {
@@ -185,14 +185,14 @@ function setupRoutes() {
             return res.status(501).send();
         }
         const insertResult = await insertGameResults(req.body);
-        res.status(insertResult.status).json(insertResult.results);
+        return res.status(insertResult.status).json(insertResult.results);
     });
 
     app.get('/api/v1/gameResults', async (req, res) => {
         if (process.env.NODB) {
             return res.status(501).send();
         }
-        res.json(await getGameResultsFromDb());
+        return res.json(await getGameResultsFromDb());
     });
 
     // Serve LWC content
