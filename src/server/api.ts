@@ -12,12 +12,6 @@ import type { DominionUser } from './common';
 //to import queries from DB service
 import { testQueryAll, getGameResultsFromDb, insertGameResults } from './db_setup';
 
-declare global {
-    namespace Express {
-        interface User extends DominionUser {}
-    }
-}
-
 const app = express();
 app.use(compression());
 
@@ -61,7 +55,7 @@ passport.serializeUser(function(user, done) {
     done(null, user);
 });
 
-function assertIsUser(user: unknown): user is Express.User {
+function assertIsUser(user: unknown): user is DominionUser {
     if (!user) {
         throw new Error('User cannot be null');
     }
@@ -82,15 +76,15 @@ passport.deserializeUser(function(user, done) {
     try {
         if (assertIsUser(user)) {
             return done(null, user);
-        } else {
-            return done('Object could not be cast to user: ' + user);
         }
+        return done('Object could not be cast to user: ' + user);
     } catch (e: any) {
         return done(e.message);
     }
 });
 
 function ensureLoggedIn(options: {throw?: boolean}) {
+    // eslint-disable-next-line no-undef
     return (req: Express.Request, res: any, next: NextFunction) => {
         if (!req.isAuthenticated || !req.isAuthenticated()) {
             if (options.throw) {
@@ -99,6 +93,7 @@ function ensureLoggedIn(options: {throw?: boolean}) {
             return res.redirect('/login/google');
         }
         next();
+        return undefined;
     }
 }
 passport.use(new passportGoogle.Strategy({
@@ -121,7 +116,7 @@ passport.use(new passportGoogle.Strategy({
         return cb("User is not authorized to use these features");
     }
 
-    const user: Express.User = {email: allowedEmail.value, name: profile.displayName };
+    const user: DominionUser = {email: allowedEmail.value, name: profile.displayName };
     return cb(null, user)
 }));
 
@@ -130,6 +125,7 @@ app.use(expressSession({secret: SESSION_SECRET, resave: false, saveUninitialized
 app.use(passport.initialize());
 app.use(passport.session());
 
+const COOKIE_USERNAME = 'dominionstats-username';
 app.get('/login/google', passport.authenticate('google'));
 app.get('/logout', (req, res) => {
     req.logout();
@@ -137,12 +133,11 @@ app.get('/logout', (req, res) => {
     res.redirect('/');
 })
 
-const COOKIE_USERNAME = 'dominionstats-username';
 app.get('/oauth2/redirect/accounts.google.com',
     passport.authenticate('google', { failureRedirect: '/', failureMessage: true }),
     function(req, res, next) {
-        if (req.user) {
-            if (req.user?.name != req.cookies[COOKIE_USERNAME]) {
+        if (req.user && assertIsUser(req.user)) {
+            if (req.user?.name !== req.cookies[COOKIE_USERNAME]) {
                 // if user successfully signed in, store user.name in cookie
                 if (req.user) {
                     res.cookie(COOKIE_USERNAME, req.user.name, {
