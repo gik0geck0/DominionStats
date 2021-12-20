@@ -8,6 +8,11 @@ module.exports = {
             lines: 95
         }
     },
+    moduleNameMapper: {
+        '^lightning/(.+)$': '<rootDir>/src/client/modules/lightning/$1/$1',
+        '^lightningtest/(.+)$': '<rootDir>/src/client/modules/lightningtest/$1/$1',
+        '^my/(.+)$': '<rootDir>/src/client/modules/my/$1/$1'
+    },
     preset: '@lwc/jest-preset',
     moduleFileExtensions: ['js', 'ts'],
     resolver: require.resolve('@lwc/jest-resolver')
