@@ -8,9 +8,7 @@ pageObjects/*
 src/client/assets/
 src/client/modules/lightning/
 src/client/modules/lightningtest/
-k8s/
 .github
-.circleci
 
 # Default resources folder
 src/client/resources
