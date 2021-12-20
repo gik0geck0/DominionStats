@@ -1,4 +1,5 @@
-import { Pool } from 'pg';
+import pg from 'pg';
+const Pool = pg.Pool;
 import { migrate } from 'postgres-migrations';
 import { validateGameData } from './validation';
 import type { TestObject, GameResultsDB, ErrorObject, GameResultsForm, PlayerResultForm, GameResultsFormResult } from './common';
@@ -15,8 +16,8 @@ import type { TestObject, GameResultsDB, ErrorObject, GameResultsForm, PlayerRes
 const pool = new Pool();
 
 //for importing from csv file
-const fs = require("fs");
-const fastcsv = require("fast-csv");
+import fs from "fs";
+import fastcsv from "fast-csv";
 
 export function getPool() {
     return pool;
