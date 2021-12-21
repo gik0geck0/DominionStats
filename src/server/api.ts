@@ -5,7 +5,6 @@ import pgSession from 'connect-pg-simple';
 import cookieParser from 'cookie-parser';
 import express, { NextFunction } from 'express';
 import expressSession from 'express-session';
-import helmet from 'helmet';
 import path from 'path';
 import passport from 'passport';
 import passportGoogle from 'passport-google-oauth20';
@@ -35,18 +34,6 @@ function setupRoutes() {
     if (HOST !== 'localhost') {
         SCHEME = 'https://';
         PUBLIC_PORT = '443';
-        app.use(helmet());
-        app.use(
-            helmet({
-                contentSecurityPolicy: {
-                    useDefaults: true,
-                    directives: {
-                        'upgrade-insecure-requests': null
-                    }
-                },
-                noSniff: undefined
-            })
-        );
     }
 
     const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
