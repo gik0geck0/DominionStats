@@ -3,9 +3,8 @@ import bodyParser from 'body-parser';
 import compression from 'compression';
 import pgSession from 'connect-pg-simple';
 import cookieParser from 'cookie-parser';
-import express, { NextFunction } from 'express';
+import type { NextFunction } from 'express';
 import expressSession from 'express-session';
-import path from 'path';
 import passport from 'passport';
 import passportGoogle from 'passport-google-oauth20';
 
