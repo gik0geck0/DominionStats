@@ -54,7 +54,8 @@ export async function init(): Promise<void> {
     }
 
     //for importing game logs from csv file
-    const stream = fs.createReadStream('/app/db-migrations/GameLogs.csv');
+    const gameCSV = process.env.HOST === 'localhost' ? 'db-migrations/GameLogs.csv' : '/app/db-migrations/GameLogs.csv';
+    const stream = fs.createReadStream(gameCSV);
     const csvData: any[] = [];
 
     //to ensure that data is only inserted once

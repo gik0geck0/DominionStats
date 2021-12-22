@@ -10,7 +10,13 @@ interface PlayerData {
     victoryPoints: number;
 }
 
+const todaysDate = new Date();
+const year = todaysDate.getFullYear();
+const month = (todaysDate.getMonth()+1).toString().padStart(2, '0');
+const day = todaysDate.getDate().toString().padStart(2, '0');
+
 export default class DataUploader extends LightningElement {
+    defaultGameId = `${year}${month}${day}a`;
     /**
      * Retrieves the data from the input fields and makes a query to upload it to the database api.
      */
