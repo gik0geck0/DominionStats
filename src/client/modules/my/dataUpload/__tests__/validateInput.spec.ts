@@ -1,4 +1,13 @@
-import { isEmptyName, isEmptyNumber, allEmpty, anyEmpty, validPlace, validateInput, ERRORS, validateFilledData } from '../helpers/validateInput';
+import {
+    isEmptyName,
+    isEmptyNumber,
+    allEmpty,
+    anyEmpty,
+    validPlace,
+    validateInput,
+    ERRORS,
+    validateFilledData
+} from '../helpers/validateInput';
 import type { GameData, PlayerData } from '../helpers/types';
 
 //jest tests
@@ -136,7 +145,7 @@ describe('Input form field validation', () => {
 
         const result = validateInput(testObject);
         expect(result.length).toEqual(1);
-        expect(result[0]).toEqual(ERRORS.MINIMUM_ENTRIES)
+        expect(result[0]).toEqual(ERRORS.MINIMUM_ENTRIES);
     });
 
     it('Entry missing a name is invalid', () => {
@@ -350,48 +359,112 @@ describe('empty functions', () => {
 
 describe('allEmpty', () => {
     it('allEmpty', () => {
-        expect(allEmpty({playerName: '', playerPlace: null, victoryPoints: null})).toEqual(true);
-        expect(allEmpty({playerName: null, playerPlace: '', victoryPoints: ''} as any)).toEqual(true);
+        expect(
+            allEmpty({ playerName: '', playerPlace: null, victoryPoints: null })
+        ).toEqual(true);
+        expect(
+            allEmpty({
+                playerName: null,
+                playerPlace: '',
+                victoryPoints: ''
+            } as any)
+        ).toEqual(true);
     });
     it('allEmpty returns false if any values are filled', () => {
-        expect(allEmpty({playerName: 'bob', playerPlace: null, victoryPoints: null})).toEqual(false);
-        expect(allEmpty({playerName: null, playerPlace: 1, victoryPoints: ''} as any)).toEqual(false);
-        expect(allEmpty({playerName: null, playerPlace: undefined, victoryPoints: 1} as any)).toEqual(false);
-        expect(allEmpty({playerName: 'bob', playerPlace: 1, victoryPoints: 1} as any)).toEqual(false);
+        expect(
+            allEmpty({
+                playerName: 'bob',
+                playerPlace: null,
+                victoryPoints: null
+            })
+        ).toEqual(false);
+        expect(
+            allEmpty({
+                playerName: null,
+                playerPlace: 1,
+                victoryPoints: ''
+            } as any)
+        ).toEqual(false);
+        expect(
+            allEmpty({
+                playerName: null,
+                playerPlace: undefined,
+                victoryPoints: 1
+            } as any)
+        ).toEqual(false);
+        expect(
+            allEmpty({
+                playerName: 'bob',
+                playerPlace: 1,
+                victoryPoints: 1
+            } as any)
+        ).toEqual(false);
     });
 });
 
 describe('anyEmpty', () => {
     it('anyEmpty', () => {
-        expect(anyEmpty({playerName: '', playerPlace: null, victoryPoints: null})).toEqual(true);
-        expect(anyEmpty({playerName: null, playerPlace: '', victoryPoints: ''} as any)).toEqual(true);
-        expect(anyEmpty({playerName: 'bob', playerPlace: null, victoryPoints: null})).toEqual(true);
-        expect(anyEmpty({playerName: null, playerPlace: 1, victoryPoints: ''} as any)).toEqual(true);
-        expect(anyEmpty({playerName: null, playerPlace: undefined, victoryPoints: 1} as any)).toEqual(true);
+        expect(
+            anyEmpty({ playerName: '', playerPlace: null, victoryPoints: null })
+        ).toEqual(true);
+        expect(
+            anyEmpty({
+                playerName: null,
+                playerPlace: '',
+                victoryPoints: ''
+            } as any)
+        ).toEqual(true);
+        expect(
+            anyEmpty({
+                playerName: 'bob',
+                playerPlace: null,
+                victoryPoints: null
+            })
+        ).toEqual(true);
+        expect(
+            anyEmpty({
+                playerName: null,
+                playerPlace: 1,
+                victoryPoints: ''
+            } as any)
+        ).toEqual(true);
+        expect(
+            anyEmpty({
+                playerName: null,
+                playerPlace: undefined,
+                victoryPoints: 1
+            } as any)
+        ).toEqual(true);
     });
 
     it('anyEmpty returns false if all values are filled', () => {
-        expect(anyEmpty({playerName: 'bob', playerPlace: 1, victoryPoints: 1} as any)).toEqual(false);
+        expect(
+            anyEmpty({
+                playerName: 'bob',
+                playerPlace: 1,
+                victoryPoints: 1
+            } as any)
+        ).toEqual(false);
     });
 });
 
 describe('validPlace', () => {
     it('rejects place < 1', () => {
-        expect(validPlace({playerPlace: 0} as any)).toEqual(false);
-        expect(validPlace({playerPlace: -1} as any)).toEqual(false);
-        expect(validPlace({playerPlace: -Infinity} as any)).toEqual(false);
+        expect(validPlace({ playerPlace: 0 } as any)).toEqual(false);
+        expect(validPlace({ playerPlace: -1 } as any)).toEqual(false);
+        expect(validPlace({ playerPlace: -Infinity } as any)).toEqual(false);
     });
     it('rejects place > 6', () => {
-        expect(validPlace({playerPlace: 7} as any)).toEqual(false);
-        expect(validPlace({playerPlace: 10} as any)).toEqual(false);
-        expect(validPlace({playerPlace: Infinity} as any)).toEqual(false);
+        expect(validPlace({ playerPlace: 7 } as any)).toEqual(false);
+        expect(validPlace({ playerPlace: 10 } as any)).toEqual(false);
+        expect(validPlace({ playerPlace: Infinity } as any)).toEqual(false);
     });
     it('accepts >=1 and <=6', () => {
-        expect(validPlace({playerPlace: 1} as any)).toEqual(true);
-        expect(validPlace({playerPlace: 2} as any)).toEqual(true);
-        expect(validPlace({playerPlace: 3} as any)).toEqual(true);
-        expect(validPlace({playerPlace: 4} as any)).toEqual(true);
-        expect(validPlace({playerPlace: 5} as any)).toEqual(true);
-        expect(validPlace({playerPlace: 6} as any)).toEqual(true);
+        expect(validPlace({ playerPlace: 1 } as any)).toEqual(true);
+        expect(validPlace({ playerPlace: 2 } as any)).toEqual(true);
+        expect(validPlace({ playerPlace: 3 } as any)).toEqual(true);
+        expect(validPlace({ playerPlace: 4 } as any)).toEqual(true);
+        expect(validPlace({ playerPlace: 5 } as any)).toEqual(true);
+        expect(validPlace({ playerPlace: 6 } as any)).toEqual(true);
     });
 });

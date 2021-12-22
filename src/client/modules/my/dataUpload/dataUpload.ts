@@ -4,7 +4,7 @@ import type { GameData, PlayerData } from './helpers/types';
 
 const todaysDate = new Date();
 const year = todaysDate.getFullYear();
-const month = (todaysDate.getMonth()+1).toString().padStart(2, '0');
+const month = (todaysDate.getMonth() + 1).toString().padStart(2, '0');
 const day = todaysDate.getDate().toString().padStart(2, '0');
 
 export default class DataUploader extends LightningElement {
@@ -77,7 +77,9 @@ export default class DataUploader extends LightningElement {
                 if (response.status == 200) location.reload();
                 //refresh page
                 else if (response.status >= 400) {
-                    this.setErrorMessages(['Something went wrong with the data upload. Please try again.']);
+                    this.setErrorMessages([
+                        'Something went wrong with the data upload. Please try again.'
+                    ]);
                     console.error('Error inserting game results: ', response);
                 }
             });
