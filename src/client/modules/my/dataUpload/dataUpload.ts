@@ -1,14 +1,6 @@
 import { LightningElement } from 'lwc';
 import { validateInput } from './helpers/validateInput';
-
-interface GameData {
-    gameId: string;
-    playerData: PlayerData[];
-}
-interface PlayerData {
-    playerName: string;
-    victoryPoints: number;
-}
+import type { GameData, PlayerData } from './helpers/types';
 
 const todaysDate = new Date();
 const year = todaysDate.getFullYear();
@@ -17,6 +9,9 @@ const day = todaysDate.getDate().toString().padStart(2, '0');
 
 export default class DataUploader extends LightningElement {
     defaultGameId = `${year}${month}${day}a`;
+    errorMessages: string[] = [];
+    showErrors = false;
+
     /**
      * Retrieves the data from the input fields and makes a query to upload it to the database api.
      */
@@ -29,6 +24,12 @@ export default class DataUploader extends LightningElement {
                 playerName: this.getValueFromInput(
                     'playerName' + (x + 1).toString()
                 ).trim(),
+                playerPlace: parseInt(
+                    this.getValueFromInput(
+                        'playerPlace' + (x + 1).toString().trim()
+                    ),
+                    10
+                ),
                 victoryPoints: parseInt(
                     this.getValueFromInput(
                         'victoryPoints' + (x + 1).toString().trim()
@@ -39,7 +40,7 @@ export default class DataUploader extends LightningElement {
         }
 
         //data for post
-        let data = {
+        let data: GameData = {
             gameId: this.getValueFromInput('gameId'),
             playerData: playerData
         };
@@ -56,10 +57,7 @@ export default class DataUploader extends LightningElement {
                     playerEntry.playerName !== '' &&
                     !Object.is(playerEntry.victoryPoints, NaN)
                 ) {
-                    newPlayerData.push({
-                        playerName: playerEntry.playerName,
-                        victoryPoints: playerEntry.victoryPoints
-                    });
+                    newPlayerData.push(playerEntry);
                 }
             }
 
@@ -79,24 +77,18 @@ export default class DataUploader extends LightningElement {
                 if (response.status == 200) location.reload();
                 //refresh page
                 else if (response.status >= 400) {
-                    this.setErrorMessage(
-                        'Something went wrong with the data upload. Please try again.'
-                    );
+                    this.setErrorMessages(['Something went wrong with the data upload. Please try again.']);
                     console.error('Error inserting game results: ', response);
                 }
             });
         } else {
-            this.setErrorMessage(errorMessages.join('\n'));
+            this.setErrorMessages(errorMessages);
         }
     }
 
-    setErrorMessage(errorString: string): void {
-        const errorElement: HTMLParagraphElement | null =
-            this.template.querySelector('p[name="errorMessage"]');
-        if (errorElement) {
-            errorElement.textContent = errorString; //set error text
-            errorElement.hidden = false; //show error message
-        }
+    setErrorMessages(errorMessages: string[]): void {
+        this.errorMessages = errorMessages;
+        this.showErrors = errorMessages.length > 0;
     }
 
     /**
@@ -111,7 +103,7 @@ export default class DataUploader extends LightningElement {
             'input[name="' + name + '"]'
         );
         if (e) {
-            return e.value;
+            return e.value.trim();
         }
         return '';
     }

@@ -127,27 +127,20 @@ export async function insertGameResults(
         return Promise.resolve({ status: 400, results: validationErrors });
     }
 
-    // Sort by victoryPoints, such that the index in gameResults = the place/ranking in the game
     gameResults = gameResults
-        .sort((a, b) => b.victoryPoints - a.victoryPoints)
         // Clean up the input a bit (trim spaces)
-        .map(({ playerName, victoryPoints }) => {
-            return { playerName: playerName.trim(), victoryPoints };
+        .map(({ playerName, victoryPoints, playerPlace }) => {
+            return { playerName: playerName.trim(), victoryPoints, playerPlace };
         });
 
     const insertErrors: ErrorObject[] = flatArray(
         await Promise.all(
-            gameResults.map(
-                (
-                    { playerName, victoryPoints },
-                    idx
-                ): Promise<ErrorObject[]> => {
-                    let playerNum = idx + 1;
+            gameResults.map(({ playerName, victoryPoints, playerPlace }): Promise<ErrorObject[]> => {
 
                     //build list
                     const values = [
                         gameId,
-                        playerNum,
+                        playerPlace,
                         playerName,
                         victoryPoints
                     ];
