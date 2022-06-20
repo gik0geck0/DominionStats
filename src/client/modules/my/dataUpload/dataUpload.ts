@@ -1,6 +1,13 @@
 import { LightningElement } from 'lwc';
 import { validateInput } from './helpers/validateInput';
-import type { GameData, PlayerData } from './helpers/types';
+import type {
+    GameData,
+    GameLog,
+    PlayerData,
+    UsernameData,
+    GameIDsAndPlayers
+} from './helpers/types';
+import { ConnectedScatterplot } from '../d3Charts/connectedScatter';
 
 const todaysDate = new Date();
 const year = todaysDate.getFullYear();
@@ -11,6 +18,12 @@ export default class DataUploader extends LightningElement {
     defaultGameId = `${year}${month}${day}a`;
     errorMessages: string[] = [];
     showErrors = false;
+    showGameArea = false;
+    showFileName = false;
+    oldGameLog?: Object;
+    gameLog?: GameLog[] = undefined;
+    gameIDs: string[] = [];
+    tableData: GameIDsAndPlayers[] = [];
 
     /**
      * Retrieves the data from the input fields and makes a query to upload it to the database api.
@@ -19,7 +32,17 @@ export default class DataUploader extends LightningElement {
         //gets value from textarea
         let textBlob: string = this.getValueFromInput('textArea');
         let dataList: GameData[] = this.processLine(textBlob);
+        let gameIds: string[] = [];
+        for (let game of dataList) {
+            gameIds.push(game.gameId);
+        }
         let errorMessages = validateInput(dataList);
+        //get file values
+        let fileString = '';
+        let fileText = this.template.querySelector(
+            'input[name="file-upload-input-107"]'
+        ) as HTMLInputElement;
+
         //if no errors were found
         if (errorMessages.length == 0) {
             let newPlayerData: PlayerData[] = []; //player data without blank entries
@@ -71,27 +94,7 @@ export default class DataUploader extends LightningElement {
         }
     }
 
-    setErrorMessages(errorMessages: string[]): void {
-        this.errorMessages = errorMessages;
-        this.showErrors = errorMessages.length > 0;
-    }
-
-    /**
-     * Gets the value from the input field with the given name.
-     * Parameters:
-     *  name: The name of the input field in HTML.
-     * Returns:
-     *  The value currently in the input field. Can be null.
-     */
-    getValueFromInput(name: string): string {
-        const e: HTMLInputElement | null = this.template.querySelector(
-            'textarea[name="' + name + '"]'
-        );
-        if (e) {
-            return e.value.trim();
-        }
-        return '';
-    }
+    //Proccess entire text area for bulk insert, returns list of GameData
     processLine(textBlob: string): GameData[] {
         let playerData: PlayerData[] = []; //data for each player input
         let dataList: GameData[] = []; //list of game data
@@ -147,5 +150,247 @@ export default class DataUploader extends LightningElement {
         };
         dataList.push(currentData);
         return dataList;
+    }
+
+    //Read in file, and prompt user to input playerNames if missing
+    onLogFileAttached(): void {
+        //Read in file from file select
+        let fileText = this.template.querySelector(
+            'input[name="file-upload-input-107"]'
+        ) as HTMLInputElement;
+        if (
+            fileText !== null &&
+            fileText.files !== null &&
+            fileText.files[0] !== null
+        ) {
+            fileText.files[0].text().then(async (result) => {
+                this.oldGameLog = JSON.parse(result);
+                this.gameLog = await this.validatePlayers(JSON.parse(result));
+                this.displayNewGameIDs(this.gameLog);
+
+                let players: UsernameData[] = [];
+                let activeUsers: UsernameData[] = [];
+                for (let log of this.gameLog) {
+                    players = log.players;
+                    for (let player of players) {
+                        let currentUser = activeUsers.filter(
+                            (element) => element.username === player.username
+                        );
+                        if (currentUser.length > 0) {
+                            player.playerName = currentUser[0].playerName;
+                            continue;
+                        }
+                        if (
+                            player.playerName === '' ||
+                            player.playerName === undefined
+                        ) {
+                            do {
+                                player.playerName = prompt(
+                                    'What is the player name for this username: ' +
+                                        player.username
+                                );
+                            } while (player.playerName === null);
+                            activeUsers.push(player);
+                        }
+                    }
+                    log.players = players;
+                }
+
+                // TODO : Handle the response, potential error handling
+            });
+        }
+        this.showGameArea = true;
+    }
+
+    setErrorMessages(errorMessages: string[]): void {
+        this.errorMessages = errorMessages;
+        this.showErrors = errorMessages.length > 0;
+    }
+
+    /**
+     * Gets the value from the input field with the given name.
+     * Parameters:
+     *  name: The name of the input field in HTML.
+     * Returns:
+     *  The value currently in the input field. Can be null.
+     */
+    getValueFromInput(name: string): string {
+        const e: HTMLInputElement | null = this.template.querySelector(
+            '[name="' + name + '"]'
+        );
+        if (e) {
+            return e.value.trim();
+        }
+        return '';
+    }
+
+    /**
+     * Gets the value from the table with the given name.
+     * Parameters:
+     *  name: The name of the table in HTML.
+     * Returns:
+     *  All gameid values in the first row
+     */
+    getValuesFromTable(name: string): string[] {
+        const e: HTMLTableElement | null = this.template.querySelector(
+            'table[name="' + name + '"]'
+        );
+        if (e) {
+            let table: string[] = [];
+            let tableValue;
+            for (let r = 1; r < e.rows.length; r++) {
+                tableValue = e.rows[r].cells[0];
+                if (tableValue !== null && tableValue.textContent !== null) {
+                    table.push(tableValue.textContent);
+                }
+            }
+            return table;
+        }
+        return [];
+    }
+
+    //Replace each gameID in file with new format based on date (YYYYMMDD[a-z])
+    displayNewGameIDs(file: GameLog[]): void {
+        let newGameIDs: string[] = [];
+        let dates: string[] = [];
+        let allPlayers: string[][] = [];
+        for (let key of file) {
+            dates.push(key.date);
+        }
+        for (let key in this.oldGameLog) {
+            allPlayers.push(this.oldGameLog[key]['players']);
+        }
+
+        let currentDate = dates[0];
+        let letter = 'a';
+        for (let date of dates) {
+            if (date !== undefined && date !== null) {
+                let year = date.substring(6);
+                let month = date.substring(3, 5);
+                let day = date.substring(0, 2);
+                if (date !== currentDate) {
+                    letter = 'a';
+                    currentDate = date;
+                }
+                let newGameID = year + month + day + letter;
+                newGameIDs.push(newGameID);
+                letter = String.fromCharCode(letter.charCodeAt(0) + 1);
+            }
+        }
+
+        // updates table and button visibiliy
+        this.showGameArea = true;
+        this.showGameArea = false;
+        this.showGameArea = true;
+
+        let oldGameIDs: string[] = [];
+
+        for (let key of file) {
+            oldGameIDs.push(key.gameID);
+        }
+        let index = 0;
+
+        let dataRow: GameIDsAndPlayers = {
+            customGameId: '',
+            dominionGameId: '',
+            playerNames: []
+        };
+        //displays all info in table
+        for (let i = 0; i < newGameIDs.length; i++) {
+            dataRow = {
+                //all new game ids
+                customGameId: newGameIDs[i],
+                //all old game ids
+                dominionGameId: oldGameIDs[i],
+                //array of all players, seperated by game
+                playerNames: allPlayers[i]
+            };
+            this.tableData.push(dataRow);
+        }
+    }
+
+    //When all data has been validated, upload new log file to server for processing
+    onSaveGameLogToServer(): void {
+        //gets values from table
+        let newGameIDs: string[] = [];
+        newGameIDs = this.getValuesFromTable('gameidtable');
+        if (this.gameLog === undefined) {
+            console.log('missing game log');
+            return;
+        }
+
+        this.gameLog = this.replaceGameIDs(this.gameLog, newGameIDs);
+        this.showGameArea = false;
+        console.log('Uploading Log: ', JSON.stringify(this.gameLog));
+
+        fetch('api/v1/logUpload', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(this.gameLog)
+        }).then((response) => {
+            if (response.status === 200) {
+                console.log('Uploaded Successfully.');
+            } else if (response.status >= 400) {
+                response
+                    .json()
+                    .then((json) => {
+                        let errors: string[] = [];
+                        for (let res of json) errors.push(res.error);
+                        // Set the error messages to be the response
+                        this.setErrorMessages(errors);
+                        console.error(errors);
+                    })
+                    .catch((err) => {
+                        console.log(err);
+                    });
+            }
+        });
+    }
+
+    //TODO: Change newGameIDs to Object, map from old game ids to new
+    //Loops through game log, replacing old gameids with new format
+    replaceGameIDs(file: GameLog[], newGameIDs: string[]): GameLog[] {
+        file.forEach((element, index) => {
+            element.gameID = newGameIDs[index];
+        });
+        return file;
+    }
+
+    //Call validateSingle to validate each game in log
+    async validatePlayers(file: Object): Promise<GameLog[]> {
+        let allLogs: GameLog[] = [];
+        //let players: string[] = [];
+        for (let key in file) {
+            allLogs.push(await this.validateSingle(file[key]));
+        }
+        return allLogs;
+    }
+
+    //Validates a single game, specifically checking if usernames have an associated playername in the DB
+    validateSingle(file: Object): Promise<GameLog> {
+        let players: string[] = file['players'];
+        return fetch('api/v1/usernameCheck', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(players)
+        })
+            .then((response) => response.json())
+            .then((data) => {
+                return {
+                    VPs: file['VPs'],
+                    date: file['date'],
+                    gameID: file['gameID'],
+                    gameStatus: file['gameStatus'],
+                    log: file['log'],
+                    players: data,
+                    uuid: file['uuid']
+                };
+                return data;
+            })
+            .catch((error) => console.error(error));
     }
 }

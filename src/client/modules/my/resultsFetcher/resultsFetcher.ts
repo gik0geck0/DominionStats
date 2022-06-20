@@ -26,8 +26,53 @@ export interface PlayerStatsAllGames {
     percent_sixth: number;
 }
 
+export interface GameLogDB {
+    id: number;
+    game_label: string;
+    player_turn: number;
+    turn_index: number;
+    player_name: string;
+    //TODO: turn to played card list if you want it to be more than just a string display
+    cards_played: string;
+    cards_purchased: string;
+}
+
 let cachedData: GameResultsData[] = [];
+let cachedDataLog: GameLogDB[] = [];
 type PlayersPerGame = Pick<GameResultsData, 'game_label' | 'player_num'>;
+
+// Returns the log data
+export function getRawData(): Promise<GameLogDB[]> {
+    if (cachedDataLog && !cachedDataLog.length) {
+        return fetch('/api/v1/logData')
+            .then((response) => response.json())
+            .then((data) => {
+                data = data.sort((a, b) =>
+                    a.game_label === b.game_label
+                        ? a.turn_index < b.turn_index
+                            ? -1
+                            : 1
+                        : a.game_label < b.game_label
+                        ? -1
+                        : 1
+                );
+                cachedDataLog = data as GameLogDB[];
+                for (let key of data) {
+                    key.cards_played = JSON.stringify(key.cards_played)
+                        .split('}')
+                        .join('} ');
+                    key.cards_purchased = JSON.stringify(key.cards_purchased)
+                        .split('}')
+                        .join('} ');
+                }
+                return data;
+            })
+            .catch((error) => {
+                console.error(error);
+            });
+    }
+    return new Promise((resolve) => resolve(cachedDataLog));
+}
 
 export function getRawResults(): Promise<GameResultsData[]> {
     if (cachedData && !cachedData.length) {

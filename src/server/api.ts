@@ -15,7 +15,10 @@ import {
     testQueryAll,
     getGameResultsFromDb,
     insertGameResult,
-    insertGameResults
+    insertGameResults,
+    insertLog,
+    usernameCheck,
+    getLogResultsFromDb
 } from './db_setup';
 
 function setupRoutes() {
@@ -25,7 +28,7 @@ function setupRoutes() {
     app.use(compression());
 
     app.use(bodyParser.urlencoded({ extended: true }));
-    app.use(bodyParser.json());
+    app.use(bodyParser.json({ limit: '5mb' }));
 
     const HOST = process.env.HOST || 'localhost';
     const PORT = process.env.PORT || 3001;
@@ -249,11 +252,50 @@ function setupRoutes() {
         }
     );
 
+    // API access to endpoint for username workflow
+    app.post(
+        '/api/v1/usernameCheck',
+        ensureLoggedIn({ throw: true }),
+        async (req, res) => {
+            if (process.env.NODB) {
+                return res.status(501).send();
+            }
+
+            const usernameCheckResult = await usernameCheck(req.body);
+            return res
+                .status(usernameCheckResult.status)
+                .json(usernameCheckResult.results);
+        }
+    );
+
+    // New API access to endpoint, use for log data insertion
+    app.post(
+        '/api/v1/logUpload',
+        ensureLoggedIn({ throw: true }),
+        async (req, res) => {
+            if (process.env.NODB) {
+                return res.status(501).send();
+            }
+
+            const logInsertResult = await insertLog(req.body);
+            return res
+                .status(logInsertResult.status)
+                .json(logInsertResult.results);
+        }
+    );
+
     app.get('/api/v1/gameResults', async (req, res) => {
         if (process.env.NODB) {
             return res.status(501).send();
         }
         return res.json(await getGameResultsFromDb());
+    });
+
+    app.get('/api/v1/logData', async (req, res) => {
+        if (process.env.NODB) {
+            return res.status(501).send();
+        }
+        return res.json(await getLogResultsFromDb());
     });
 
     /*

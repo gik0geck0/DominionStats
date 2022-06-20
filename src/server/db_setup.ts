@@ -2,14 +2,21 @@ import pg from 'pg';
 const Pool = pg.Pool;
 import { migrate } from 'postgres-migrations';
 import { validateGameData } from './validation';
+import { parseLog } from './log_parser';
 import type {
     TestObject,
     GameResultsDB,
     ErrorObject,
     GameResultsForm,
     PlayerResultForm,
-    GameResultsFormResult
+    GameResultsFormResult,
+    UsernameFormResult,
+    LogFormResult,
+    UsernameMapping,
+    GameLogServer,
+    GameLogDB
 } from './common';
+import type { PlayerTurn } from './log_values';
 
 /**
  * Single global pool to be used for all queries
@@ -107,11 +114,18 @@ export async function getGameResultsFromDb(): Promise<GameResultsDB[]> {
     return res.rows as GameResultsDB[];
 }
 
+export async function getLogResultsFromDb(): Promise<GameLogDB[]> {
+    const res = await pool.query(
+        'SELECT id, game_label, player_turn, turn_index, player_name, cards_played, cards_purchased FROM log_game_round'
+    );
+    return res.rows as GameLogDB[];
+}
+
 function flatArray<T>(arrarr: T[][]): T[] {
     return arrarr.reduce((acc, val) => acc.concat(val), []);
 }
 
-//Submitting an individual game
+// Submitting an individual game
 // This is the original, tried and true function
 export async function insertGameResult(
     req: GameResultsForm
@@ -186,7 +200,8 @@ export async function insertGameResult(
 // Checks the existence of an ID in the database
 // Returns list of errors, one for each duplicate ID
 export async function checkGameIdExists(
-    gameId: string[]
+    gameId: string[],
+    database: 'game_results' | 'log_game_round'
 ): Promise<ErrorObject[]> {
     //Create an array of $#'s
     let params: string[] = [];
@@ -197,7 +212,9 @@ export async function checkGameIdExists(
     // TODO : Convert to simpler method : ... WHERE game_label = ANY($1::string[])
     // https://stackoverflow.com/questions/10720420/node-postgres-how-to-execute-where-col-in-dynamic-value-list-query
     let queryText: string =
-        'SELECT * FROM game_results WHERE game_label IN (' +
+        'SELECT DISTINCT game_label FROM ' +
+        database +
+        ' WHERE game_label IN (' +
         params.join(',') +
         ')';
     const res = await pool.query(queryText, gameId);
@@ -218,8 +235,8 @@ export async function checkGameIdExists(
     return allErrors;
 }
 
-//to test data upload
-//when page is refreshed, submitted data shows up in raw results table
+// To test data upload:
+// When page is refreshed, submitted data shows up in raw results table
 // This is the new function that can handle multiple insertions
 export async function insertGameResults(
     allReq: GameResultsForm[]
@@ -228,32 +245,259 @@ export async function insertGameResults(
     let allErrors: ErrorObject[] = [];
 
     // Check all game IDs being inserted
-    const allIds: string[] = [];
-    for (let req of allReq) {
-        allIds.push(req.gameId);
-    }
-
-    let gameIdExists = await checkGameIdExists(allIds);
+    const allIds: string[] = allReq.map((element) => element.gameId);
+    let gameIdExists = await checkGameIdExists(allIds, 'game_results');
 
     if (gameIdExists.length > 0) {
         return { status: 409, results: gameIdExists };
     }
 
-    //Loops for additional game data
+    // Loops for additional game data
     for (let req of allReq) {
         // If not a duplicate, insert it
         result = await insertGameResult(req);
-        //If the result is a user input error
+        // If the result is a user input error
         if (result.status == 500 || result.status == 400) {
             allErrors = allErrors.concat(result.results);
         }
     }
 
     if (allErrors.length != 0) {
-        //If there was an eror return a status of 500 and all errors
+        // If there was an eror return a status of 500 and all errors
         return { status: 500, results: allErrors };
     } else {
-        //Other wise return success
+        // Otherwise return success
         return { status: 200, results: [] };
+    }
+}
+
+// Function to verify the existence of usernames in the DB
+export async function usernameCheck(
+    usernames: string[]
+): Promise<UsernameFormResult> {
+    let userList: UsernameMapping[] = [];
+    let allErrors: ErrorObject[] = [];
+
+    //Create an array of $#'s
+    let params: string[] = [];
+    for (let i = 1; i <= usernames.length; i++) {
+        params.push('$' + i);
+    }
+
+    // TODO : Convert to simpler method : ... WHERE game_label = ANY($1::string[])
+    // https://stackoverflow.com/questions/10720420/node-postgres-how-to-execute-where-col-in-dynamic-value-list-query
+    let queryText: string =
+        'SELECT DISTINCT * FROM known_usernames WHERE username IN (' +
+        params.join(',') +
+        ')';
+    const res = await pool.query(queryText, usernames);
+
+    // Add elements that were defined in the database
+    for (let row of res.rows) {
+        userList.push({
+            username: row.username,
+            playerName: row.player_name,
+            playerSymbol: ''
+        });
+    }
+
+    // Add elements that were not defined in the database
+    for (let username of usernames) {
+        if (
+            userList.filter((element) => element.username === username)
+                .length === 0
+        ) {
+            userList.push({
+                username: username,
+                playerName: '',
+                playerSymbol: ''
+            });
+        }
+    }
+
+    // Attempt to generate unique symbols
+    try {
+        userList = userSymbolGenerator(userList);
+    } catch (e: any) {
+        console.log('Username symbol error: ' + e.message);
+        allErrors.push({ status: 'error', error: e.message });
+    }
+
+    if (allErrors.length != 0) {
+        return { status: 400, results: allErrors };
+    }
+    return { status: 200, results: userList };
+}
+
+// Helper function to generate username symbols
+export function userSymbolGenerator(
+    names: UsernameMapping[]
+): UsernameMapping[] {
+    let dupSym: string | undefined;
+    for (let name of names) {
+        // If duplicate username, error
+        if (
+            names.filter((element) => element.username === name.username)
+                .length > 1
+        )
+            throw new Error(
+                'Duplicate usernames in player names: ' + name.username
+            );
+        // If symbols are undefined
+        if (name.playerSymbol === '') name.playerSymbol = name.username[0];
+        // Check for duplicate symbols
+        if (
+            names.filter(
+                (element) => element.playerSymbol === name.playerSymbol
+            ).length > 1
+        ) {
+            dupSym = name.playerSymbol;
+            break;
+        }
+    }
+
+    // No duplicates
+    if (dupSym === undefined) return names;
+
+    let duplicateNames = names.filter(
+        (element) => element.playerSymbol === dupSym
+    );
+    let updated = false; // Makes sure that at least one element was updated
+    for (let name of duplicateNames) {
+        if (name.username.length > dupSym.length) {
+            // For each name, add an extra character to the symbol
+            name.playerSymbol = name.username.slice(0, dupSym.length + 1);
+            updated = true;
+        }
+        // If the symbol is as long as the username, then it cannot be extended further
+    }
+    if (!updated)
+        throw new Error(
+            'Unable to generate unique symbol. Closest form: ' + dupSym
+        );
+    return userSymbolGenerator(names);
+}
+
+// Function for adding a log to the log database
+export async function insertLog(log: GameLogServer[]): Promise<LogFormResult> {
+    let allErrors: ErrorObject[] = [];
+    let allTurns: PlayerTurn[] = [];
+
+    let gameID: string;
+    let players: UsernameMapping[];
+    let gameLog: string;
+
+    // Check that no duplicate logs were uploaded
+    const allIds: string[] = log.map((element) => element.gameID);
+    let gameIdExists = await checkGameIdExists(allIds, 'log_game_round');
+    if (gameIdExists.length > 0) {
+        return { status: 409, results: gameIdExists };
+    }
+
+    for (let item of log) {
+        gameID = item.gameID;
+
+        players = item.players;
+
+        // Add unknown users to the database
+
+        let usernames = players.map((player) => player.username);
+        // TODO : Convert to simpler method : ... WHERE game_label = ANY($1::string[])
+        // https://stackoverflow.com/questions/10720420/node-postgres-how-to-execute-where-col-in-dynamic-value-list-query
+        let params: string[] = [];
+        for (let i = 1; i <= usernames.length; i++) {
+            params.push('$' + i);
+        }
+        let userQuery =
+            'SELECT username FROM known_usernames WHERE username IN (' +
+            params.join(',') +
+            ')';
+
+        // Get usernames and filter
+        let dominionNames = await pool.query(userQuery, usernames);
+        let dominionUsernames = dominionNames.rows.map(
+            (player) => player.username
+        );
+        usernames = usernames.filter(
+            (name) => !dominionUsernames.includes(name)
+        );
+
+        // Add users that aren't in the database
+        let userAddQuery =
+            'INSERT INTO known_usernames (username, player_name) VALUES ($1, $2)';
+        for (let user of usernames) {
+            let currentPlayer = players.find((player) => {
+                return player.username === user;
+            });
+            if (currentPlayer == undefined) {
+                allErrors.push({
+                    status: 'error',
+                    error: 'There was an error while adding a user: ' + user
+                });
+                break;
+            }
+            await pool.query(userAddQuery, [
+                currentPlayer.username,
+                currentPlayer.playerName
+            ]);
+        }
+
+        gameLog = item.log;
+        // Check that all of the above elements actually exist in log
+        if (
+            gameID === undefined ||
+            players === undefined ||
+            gameLog === undefined
+        ) {
+            allErrors.push({
+                status: 'error',
+                error: 'Log does not match expected format'
+            });
+            break;
+        } else {
+            try {
+                allTurns = parseLog(gameID, players, gameLog);
+                const query =
+                    'INSERT INTO log_game_round (game_label, player_turn, turn_index, player_name, cards_played, cards_purchased) VALUES ($1, $2, $3, $4, $5, $6)';
+
+                // Loop through each turn
+                for (let turn of allTurns) {
+                    // Set values for the data
+                    const values = [
+                        turn.gameId,
+                        turn.playerTurn,
+                        turn.turnIndex,
+                        turn.playerName,
+                        JSON.stringify(turn.playedCards),
+                        JSON.stringify(turn.purchasedCards)
+                    ];
+
+                    // Make query to the server
+                    pool.query(query, values)
+                        .then(() => [])
+                        .catch((error) => {
+                            allErrors.push({
+                                status: 'error',
+                                error:
+                                    'DB Error while adding log: ' +
+                                    error.message
+                            });
+                            console.log('DB Error while adding log: ', error);
+                        });
+                }
+            } catch (e: any) {
+                console.log('Log error: ' + e.message);
+                allErrors.push({
+                    status: 'error',
+                    error: e.message
+                });
+            }
+        }
+    }
+
+    if (allErrors.length != 0) {
+        return { status: 400, results: allErrors };
+    } else {
+        return { status: 200, results: allTurns };
     }
 }
